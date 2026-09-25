@@ -34,11 +34,8 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
+// تفعيل إظهار الخطأ الحقيقي على الشاشة مؤقتاً
+app.UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
