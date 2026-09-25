@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using SharjahEventsWeb.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// تسجيل قاعدة البيانات مباشرة بدون أي إضافات خارجية
+// ربط قاعدة بيانات Supabase عبر PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -17,10 +18,26 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
+// إنشاء الجداول في قاعدة البيانات تلقائياً عند التشغيل لمنع أخطاء 500
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.CanConnect();
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        context.Database.EnsureCreated();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "حدث خطأ أثناء إنشء قاعدة البيانات.");
+    }
+}
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -28,9 +45,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// الترتيب الصحيح: يجب أن يكون UseSession قبل UseAuthorization دائماً
-app.UseSession();
 app.UseAuthorization();
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
