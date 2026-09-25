@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// إجبار التطبيق على الاستماع على المنفذ 8080 المطلوب من Render
+builder.WebHost.UseUrls("http://0.0.0.0:8080");
+
 // 1. تسجيل قاعدة بيانات Supabase مع رفع مهلة الأوامر إلى 120 ثانية
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
