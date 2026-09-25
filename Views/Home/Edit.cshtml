@@ -1,0 +1,78 @@
+@{
+    ViewData["Title"] = "تعديل البيانات";
+    var sec = ViewBag.Section as string;
+    var item = Model;
+}
+
+<div class="container my-5" dir="rtl">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4 p-4 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                    <h3 class="fw-bold text-dark mb-0">تعديل بيانات السجل</h3>
+                    <a href="/Home/Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3">← العودة للرئيسية</a>
+                </div>
+
+                <form method="post" action="/Home/Edit">
+                    <input type="hidden" name="section" value="@sec" />
+                    <input type="hidden" name="id" value="@item.Id" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">السنة:</label>
+                            <input type="number" name="year" class="form-control" value="@(sec == "SharjahBookFairs" ? item.ExhibitionYear : sec == "SharjahChildFestivals" ? item.FestivalYear : item.ConferenceYear)" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">اسم دار النشر:</label>
+                            <input type="text" name="houseName" class="form-control" value="@item.PublishingHouseName" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">الدولة:</label>
+                            <input type="text" name="country" class="form-control" value="@item.Country" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">المدينة:</label>
+                            <input type="text" name="city" class="form-control" value="@item.City" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">رقم واتساب:</label>
+                            <input type="text" name="whatsapp" class="form-control" value="@item.WhatsAppNumber" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">البريد الإلكتروني:</label>
+                            <input type="email" name="email" class="form-control" value="@item.Email" required />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">اسم الشخص المسؤول:</label>
+                            <input type="text" name="person" class="form-control" value="@item.ResponsiblePerson" required />
+                        </div>
+
+                        @if (sec == "SharjahBookFairs" || sec == "SharjahChildFestivals")
+                        {
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">عدد الإصدارات:</label>
+                                <input type="number" name="bookCount" class="form-control" value="@item.BookCount" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">المساحة المطلوبة:</label>
+                                <input type="number" step="0.01" name="requiredSpace" class="form-control" value="@item.RequiredSpace" />
+                            </div>
+                        }
+
+                        @if (sec == "SharjahBookFairs")
+                        {
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">التخصص:</label>
+                                <input type="text" name="specialization" class="form-control" value="@item.Specialization" />
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-grid mt-4 pt-3 border-top">
+                        <button type="submit" class="btn btn-primary py-3 fw-bold rounded-3">حفظ التعديلات 💾</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
