@@ -18,21 +18,21 @@ namespace SharjahEventsWeb.Controllers
         }
 
         public IActionResult Index()
-        {
-            if (HttpContext.Session.GetString("UserEmail") == null)
-            {
-                return RedirectToAction("Login");
-            }
+{
+    if (HttpContext.Session.GetString("UserEmail") == null)
+    {
+        return RedirectToAction("Login");
+    }
 
-            // جلب كافة السجلات من الجداول لتظهر في الواجهة
-            ViewBag.SharjahBookFairs = _context.SharjahBookFairs.ToList();
-            ViewBag.SharjahChildFestivals = _context.SharjahChildFestivals.ToList();
-            ViewBag.DistributorsConferences = _context.DistributorsConferences.ToList();
-            ViewBag.NewYorkSessions = _context.NewYorkSessions.ToList();
-            ViewBag.PublishersConferences = _context.PublishersConferences.ToList();
+    // جلب كافة السجلات من الجداول لتظهر في الواجهة
+    ViewBag.SharjahBookFairs = _context.SharjahBookFairs.ToList();
+    ViewBag.SharjahChildFestivals = _context.SharjahChildFestivals.ToList();
+    ViewBag.DistributorsConferences = _context.DistributorsConferences.ToList();
+    ViewBag.NewYorkSessions = _context.NewYorkSessions.ToList();
+    ViewBag.PublishersConferences = _context.PublishersConferences.ToList();
 
-            return View();
-        }
+    return View();
+}
 
         [HttpGet]
         public IActionResult Login()
