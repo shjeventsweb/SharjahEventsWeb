@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ClosedXML.Excel;
 using System.Data;
-using Microsoft.Data.Sqlite;
-using System.IO;
+using Microsoft.EntityFrameworkCore;
 using SharjahEventsWeb.Models;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +23,13 @@ namespace SharjahEventsWeb.Controllers
             {
                 return RedirectToAction("Login");
             }
+
+            // جلب كافة السجلات من الجداول لتظهر في الواجهة
+            ViewBag.SharjahBookFairs = _context.SharjahBookFairs.ToList();
+            ViewBag.SharjahChildFestivals = _context.SharjahChildFestivals.ToList();
+            ViewBag.DistributorsConferences = _context.DistributorsConferences.ToList();
+            ViewBag.NewYorkSessions = _context.NewYorkSessions.ToList();
+            ViewBag.PublishersConferences = _context.PublishersConferences.ToList();
 
             return View();
         }
