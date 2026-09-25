@@ -7,12 +7,12 @@ namespace SharjahEventsWeb.Models
         [Key]
         public int Id { get; set; }
         public int FestivalYear { get; set; }
-        public string PublishingHouseName { get; set; }
-        public string Country { get; set; }
-        public string City { get; set; }
-        public string WhatsAppNumber { get; set; }
-        public string Email { get; set; }
-        public string ResponsiblePerson { get; set; }
+        public string PublishingHouseName { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public string WhatsAppNumber { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string ResponsiblePerson { get; set; } = string.Empty;
         public int BookCount { get; set; }
         public decimal RequiredSpace { get; set; }
     }
