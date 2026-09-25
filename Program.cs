@@ -23,7 +23,7 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// 4. إنشاء الجداول تلقائياً في سحابة Supabase مع مهلة واسعة
+// 4. إنشاء الجداول تلقائياً في سحابة Supabase إذا لم تكن موجودة
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -35,8 +35,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
+// الترتيب الصحيح: يجب أن يكون UseSession قبل UseAuthorization دائماً
 app.UseSession();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
