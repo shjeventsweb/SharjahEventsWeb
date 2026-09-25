@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SharjahEventsWeb")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+872a25cffb25ddbed7aec5fd15c75bd9efe56f9c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d11b49371619f9ab6e1c6a3903381641641b4208")]
 [assembly: System.Reflection.AssemblyProductAttribute("SharjahEventsWeb")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SharjahEventsWeb")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
