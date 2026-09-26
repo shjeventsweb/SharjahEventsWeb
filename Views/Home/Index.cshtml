@@ -9,7 +9,6 @@
 }
 
 <style>
-    /* تنسيق ألوان الأقسام المخصصة للتبويبات والأزرار */
     .tab-bookfair { background-color: #0d6efd !important; color: white !important; }
     .tab-child { background-color: #198754 !important; color: white !important; }
     .tab-distributors { background-color: #ffc107 !important; color: #000 !important; }
@@ -55,7 +54,7 @@
         </form>
     </div>
 
-    <!-- التبويبات بألوان مختلفة -->
+    <!-- التبويبات -->
     <ul class="nav nav-pills mb-3 gap-2" id="eventTabs" role="tablist">
         <li class="nav-item"><button class="nav-link tab-bookfair active shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#bookfair" type="button">📘 معرض الكتاب</button></li>
         <li class="nav-item"><button class="nav-link tab-child shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#child" type="button">🎈 مهرجان الطفل</button></li>
@@ -66,13 +65,12 @@
 
     <div class="tab-content bg-white p-4 rounded-4 shadow-sm">
         
-        <!-- 1. معرض الكتاب (أزرق) -->
+        <!-- 1. معرض الكتاب -->
         <div class="tab-pane fade show active" id="bookfair" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold text-primary">📘 معرض الشارقة الدولي للكتاب</h4>
                 <div>
                     <a href="/Home/AddRecord?section=SharjahBookFairs" class="btn btn-primary rounded-pill px-3 fw-bold">＋ إضافة</a>
-                    <a href="/Home/ExportToExcel?tableName=SharjahBookFairs&fileName=معرض_الكتاب" class="btn btn-outline-primary rounded-pill px-3 fw-bold">📊 تصدير Excel</a>
                 </div>
             </div>
             <div class="table-responsive">
@@ -81,7 +79,7 @@
                         <tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإصدارات</th><th>التخصص</th><th>المساحة</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
-                        @if (bookFairs != null) {
+                        @if (bookFairs != null && bookFairs.Count > 0) {
                             @foreach (var item in bookFairs) {
                                 <tr>
                                     <td>@item.ExhibitionYear</td>
@@ -95,27 +93,23 @@
                                     <td>@item.RequiredSpace م²</td>
                                     <td>
                                         <a href="/Home/Edit?section=SharjahBookFairs&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-2">تعديل ✏️</a>
-                                        <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
-                                            <input type="hidden" name="section" value="SharjahBookFairs" />
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-2">حذف 🗑️</button>
-                                        </form>
                                     </td>
                                 </tr>
                             }
+                        } else {
+                            <tr><td colspan="10" class="text-center text-muted py-3">لا توجد بيانات مسجلة حتى الآن.</td></tr>
                         }
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 2. مهرجان الطفل (أخضر) -->
+        <!-- 2. مهرجان الطفل -->
         <div class="tab-pane fade" id="child" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold text-success">🎈 مهرجان الشارقة القرائي للطفل</h4>
                 <div>
                     <a href="/Home/AddRecord?section=SharjahChildFestivals" class="btn btn-success rounded-pill px-3 fw-bold">＋ إضافة</a>
-                    <a href="/Home/ExportToExcel?tableName=SharjahChildFestivals&fileName=مهرجان_الطفل" class="btn btn-outline-success rounded-pill px-3 fw-bold">📊 تصدير Excel</a>
                 </div>
             </div>
             <div class="table-responsive">
@@ -124,7 +118,7 @@
                         <tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإصدارات</th><th>المساحة</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
-                        @if (childFestivals != null) {
+                        @if (childFestivals != null && childFestivals.Count > 0) {
                             @foreach (var item in childFestivals) {
                                 <tr>
                                     <td>@item.FestivalYear</td>
@@ -135,29 +129,23 @@
                                     <td>@item.ResponsiblePerson</td>
                                     <td>@item.BookCount</td>
                                     <td>@item.RequiredSpace م²</td>
-                                    <td>
-                                        <a href="/Home/Edit?section=SharjahChildFestivals&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-2">تعديل ✏️</a>
-                                        <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
-                                            <input type="hidden" name="section" value="SharjahChildFestivals" />
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-2">حذف 🗑️</button>
-                                        </form>
-                                    </td>
+                                    <td><a href="/Home/Edit?section=SharjahChildFestivals&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-2">تعديل ✏️</a></td>
                                 </tr>
                             }
+                        } else {
+                            <tr><td colspan="9" class="text-center text-muted py-3">لا توجد بيانات مسجلة حتى الآن.</td></tr>
                         }
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 3. مؤتمر الموزعين (أصفر / ذهبي) -->
+        <!-- 3. مؤتمر الموزعين -->
         <div class="tab-pane fade" id="distributors" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold text-dark">🤝 مؤتمر الموزعين</h4>
                 <div>
                     <a href="/Home/AddRecord?section=DistributorsConferences" class="btn btn-warning rounded-pill px-3 fw-bold text-dark">＋ إضافة</a>
-                    <a href="/Home/ExportToExcel?tableName=DistributorsConferences&fileName=مؤتمر_الموزعين" class="btn btn-outline-dark rounded-pill px-3 fw-bold">📊 تصدير Excel</a>
                 </div>
             </div>
             <div class="table-responsive">
@@ -166,7 +154,7 @@
                         <tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
-                        @if (distributors != null) {
+                        @if (distributors != null && distributors.Count > 0) {
                             @foreach (var item in distributors) {
                                 <tr>
                                     <td>@item.ConferenceYear</td>
@@ -175,29 +163,23 @@
                                     <td>@item.WhatsAppNumber</td>
                                     <td>@item.Email</td>
                                     <td>@item.ResponsiblePerson</td>
-                                    <td>
-                                        <a href="/Home/Edit?section=DistributorsConferences&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-2">تعديل ✏️</a>
-                                        <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
-                                            <input type="hidden" name="section" value="DistributorsConferences" />
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-2">حذف 🗑️</button>
-                                        </form>
-                                    </td>
+                                    <td><a href="/Home/Edit?section=DistributorsConferences&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-2">تعديل ✏️</a></td>
                                 </tr>
                             }
+                        } else {
+                            <tr><td colspan="7" class="text-center text-muted py-3">لا توجد بيانات مسجلة حتى الآن.</td></tr>
                         }
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 4. دورة نيويورك (بنفسجي) -->
+        <!-- 4. دورة نيويورك -->
         <div class="tab-pane fade" id="newyork" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold" style="color: #6f42c1;">🗽 دورة نيويورك</h4>
                 <div>
                     <a href="/Home/AddRecord?section=NewYorkSessions" class="btn rounded-pill px-3 fw-bold text-white" style="background-color: #6f42c1;">＋ إضافة</a>
-                    <a href="/Home/ExportToExcel?tableName=NewYorkSessions&fileName=دورة_نيويورك" class="btn btn-outline-secondary rounded-pill px-3 fw-bold">📊 تصدير Excel</a>
                 </div>
             </div>
             <div class="table-responsive">
@@ -206,7 +188,7 @@
                         <tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
-                        @if (newYork != null) {
+                        @if (newYork != null && newYork.Count > 0) {
                             @foreach (var item in newYork) {
                                 <tr>
                                     <td>@item.SessionYear</td>
@@ -215,29 +197,23 @@
                                     <td>@item.WhatsAppNumber</td>
                                     <td>@item.Email</td>
                                     <td>@item.ResponsiblePerson</td>
-                                    <td>
-                                        <a href="/Home/Edit?section=NewYorkSessions&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-2">تعديل ✏️</a>
-                                        <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
-                                            <input type="hidden" name="section" value="NewYorkSessions" />
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-2">حذف 🗑️</button>
-                                        </form>
-                                    </td>
+                                    <td><a href="/Home/Edit?section=NewYorkSessions&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-2">تعديل ✏️</a></td>
                                 </tr>
                             }
+                        } else {
+                            <tr><td colspan="7" class="text-center text-muted py-3">لا توجد بيانات مسجلة حتى الآن.</td></tr>
                         }
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 5. مؤتمر الناشرين (برتقالي) -->
+        <!-- 5. مؤتمر الناشرين -->
         <div class="tab-pane fade" id="publishers" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold" style="color: #fd7e14;">🏢 مؤتمر الناشرين</h4>
                 <div>
                     <a href="/Home/AddRecord?section=PublishersConferences" class="btn rounded-pill px-3 fw-bold text-white" style="background-color: #fd7e14;">＋ إضافة</a>
-                    <a href="/Home/ExportToExcel?tableName=PublishersConferences&fileName=مؤتمر_الناشرين" class="btn btn-outline-warning rounded-pill px-3 fw-bold text-dark">📊 تصدير Excel</a>
                 </div>
             </div>
             <div class="table-responsive">
@@ -246,7 +222,7 @@
                         <tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
-                        @if (publishersConf != null) {
+                        @if (publishersConf != null && publishersConf.Count > 0) {
                             @foreach (var item in publishersConf) {
                                 <tr>
                                     <td>@item.ConferenceYear</td>
@@ -255,16 +231,11 @@
                                     <td>@item.WhatsAppNumber</td>
                                     <td>@item.Email</td>
                                     <td>@item.ResponsiblePerson</td>
-                                    <td>
-                                        <a href="/Home/Edit?section=PublishersConferences&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-2">تعديل ✏️</a>
-                                        <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
-                                            <input type="hidden" name="section" value="PublishersConferences" />
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-2">حذف 🗑️</button>
-                                        </form>
-                                    </td>
+                                    <td><a href="/Home/Edit?section=PublishersConferences&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-2">تعديل ✏️</a></td>
                                 </tr>
                             }
+                        } else {
+                            <tr><td colspan="7" class="text-center text-muted py-3">لا توجد بيانات مسجلة حتى الآن.</td></tr>
                         }
                     </tbody>
                 </table>
