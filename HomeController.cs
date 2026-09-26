@@ -122,6 +122,16 @@ namespace SharjahEventsWeb.Controllers
             return View();
         }
 
+        // دالة عرض صفحة إضافة البيانات (GET)
+        [HttpGet]
+        public IActionResult AddRecord(string section)
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
+            ViewBag.Section = section;
+            return View();
+        }
+
+        // دالة حفظ البيانات المُرسلة (POST)
         [HttpPost]
         public IActionResult AddRecord(string section, int exhibitionYear, int festivalYear, int conferenceYear, int sessionYear, string publishingHouseName, string country, string city, string whatsAppNumber, string email, string responsiblePerson, int bookCount, string specialization, string requiredSpace)
         {
