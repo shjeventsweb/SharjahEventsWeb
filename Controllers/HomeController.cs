@@ -22,11 +22,24 @@ namespace SharjahEventsWeb.Controllers
         [HttpPost]
         public IActionResult Login(string email, string password)
         {
-            if ((email == "admin@sharjah.ae" && password == "Admin@2026") || 
-                _context.Users.Any(u => u.Email == email && u.Password == password))
+            // السماح بالحساب الافتراضي مباشرة لتفادي أي خطأ في قاعدة البيانات
+            if (email == "admin@sharjah.ae" && password == "Admin@2026")
             {
                 HttpContext.Session.SetString("UserEmail", email);
                 return RedirectToAction("Index");
+            }
+
+            try
+            {
+                if (_context.Users.Any(u => u.Email == email && u.Password == password))
+                {
+                    HttpContext.Session.SetString("UserEmail", email);
+                    return RedirectToAction("Index");
+                }
+            }
+            catch
+            {
+                // تجاوز الخطأ في حال لم يتم تهيئة جدول المستخدمين بعد في السحابة
             }
 
             ModelState.AddModelError("", "البريد الإلكتروني أو كلمة المرور غير صحيحة.");
@@ -206,6 +219,75 @@ namespace SharjahEventsWeb.Controllers
             _context.SaveChanges();
 
             TempData["SuccessMessage"] = "تم إضافة الفعالية بنجاح!";
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult Delete(string section, int id)
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null) 
+                return RedirectToAction("Login");
+
+            if (section == "SharjahBookFairs")
+            {
+                var item = _context.SharjahBookFairs.Find(id);
+                if (item != null) { _context.SharjahBookFairs.Remove(item); }
+            }
+            else if (section == "SharjahChildFestivals")
+            {
+                var item = _context.SharjahChildFestivals.Find(id);
+                if (item != null) { _context.SharjahChildFestivals.Remove(item); }
+            }
+            else if (section == "DistributorsConferences")
+            {
+                var item = _context.DistributorsConferences.Find(id);
+                if (item != null) { _context.DistributorsConferences.Remove(item); }
+            }
+            else if (section == "NewYorkSessions")
+            {
+                var item = _context.NewYorkSessions.Find(id);
+                if (item != null) { _context.NewYorkSessions.Remove(item); }
+            }
+            else if (section == "PublishersConferences")
+            {
+                var item = _context.PublishersConferences.Find(id);
+                if (item != null) { _context.PublishersConferences.Remove(item); }
+            }
+
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "تم حذف السجل بنجاح!";
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult DeleteAll(string section)
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null) 
+                return RedirectToAction("Login");
+
+            if (section == "SharjahBookFairs")
+            {
+                _context.SharjahBookFairs.RemoveRange(_context.SharjahBookFairs);
+            }
+            else if (section == "SharjahChildFestivals")
+            {
+                _context.SharjahChildFestivals.RemoveRange(_context.SharjahChildFestivals);
+            }
+            else if (section == "DistributorsConferences")
+            {
+                _context.DistributorsConferences.RemoveRange(_context.DistributorsConferences);
+            }
+            else if (section == "NewYorkSessions")
+            {
+                _context.NewYorkSessions.RemoveRange(_context.NewYorkSessions);
+            }
+            else if (section == "PublishersConferences")
+            {
+                _context.PublishersConferences.RemoveRange(_context.PublishersConferences);
+            }
+
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "تم حذف جميع السجلات لهذا القسم بنجاح!";
             return RedirectToAction("Index");
         }
     }

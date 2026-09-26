@@ -28,7 +28,6 @@ else
 {
     string npgsqlConnectionString;
     
-    // إذا كان الرابط يبدأ بـ postgres:// أو postgresql:// (مثل روابط Supabase أو Render) قم بتحويله
     if (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://"))
     {
         var databaseUri = new Uri(connectionString);
