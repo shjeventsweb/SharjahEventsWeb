@@ -18,21 +18,21 @@ namespace SharjahEventsWeb.Controllers
         }
 
         public IActionResult Index()
-{
-    if (HttpContext.Session.GetString("UserEmail") == null)
-    {
-        return RedirectToAction("Login");
-    }
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null)
+            {
+                return RedirectToAction("Login");
+            }
 
-    // جلب كافة السجلات من الجداول لتظهر في الواجهة
-    ViewBag.SharjahBookFairs = _context.SharjahBookFairs.ToList();
-    ViewBag.SharjahChildFestivals = _context.SharjahChildFestivals.ToList();
-    ViewBag.DistributorsConferences = _context.DistributorsConferences.ToList();
-    ViewBag.NewYorkSessions = _context.NewYorkSessions.ToList();
-    ViewBag.PublishersConferences = _context.PublishersConferences.ToList();
+            // جلب كافة السجلات من الجداول لتظهر في الواجهة
+            ViewBag.SharjahBookFairs = _context.SharjahBookFairs.ToList();
+            ViewBag.SharjahChildFestivals = _context.SharjahChildFestivals.ToList();
+            ViewBag.DistributorsConferences = _context.DistributorsConferences.ToList();
+            ViewBag.NewYorkSessions = _context.NewYorkSessions.ToList();
+            ViewBag.PublishersConferences = _context.PublishersConferences.ToList();
 
-    return View();
-}
+            return View();
+        }
 
         [HttpGet]
         public IActionResult Login()
@@ -91,29 +91,79 @@ namespace SharjahEventsWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddRecord(string section, int year, string houseName, string country, string city, string whatsapp, string email, string person, int bookCount, string specialization, decimal requiredSpace)
+        public IActionResult AddRecord(string section, int year, string houseName, string country, string city, string whatsapp, string email, string person, int bookCount, string specialization, string requiredSpace)
         {
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
 
             if (section == "SharjahBookFairs")
             {
-                _context.SharjahBookFairs.Add(new SharjahBookFair { ExhibitionYear = year, PublishingHouseName = houseName, Country = country, City = city, WhatsAppNumber = whatsapp, Email = email, ResponsiblePerson = person, BookCount = bookCount, Specialization = specialization ?? "", RequiredSpace = requiredSpace });
+                _context.SharjahBookFairs.Add(new SharjahBookFair 
+                { 
+                    ExhibitionYear = year, 
+                    PublishingHouseName = houseName, 
+                    Country = country, 
+                    City = city, 
+                    WhatsAppNumber = whatsapp, 
+                    Email = email, 
+                    ResponsiblePerson = person, 
+                    BookCount = bookCount, 
+                    Specialization = specialization ?? "", 
+                    RequiredSpace = requiredSpace ?? "" 
+                });
             }
             else if (section == "SharjahChildFestivals")
             {
-                _context.SharjahChildFestivals.Add(new SharjahChildFestival { FestivalYear = year, PublishingHouseName = houseName, Country = country, City = city, WhatsAppNumber = whatsapp, Email = email, ResponsiblePerson = person, BookCount = bookCount, RequiredSpace = requiredSpace });
+                _context.SharjahChildFestivals.Add(new SharjahChildFestival 
+                { 
+                    FestivalYear = year, 
+                    PublishingHouseName = houseName, 
+                    Country = country, 
+                    City = city, 
+                    WhatsAppNumber = whatsapp, 
+                    Email = email, 
+                    ResponsiblePerson = person, 
+                    BookCount = bookCount, 
+                    RequiredSpace = requiredSpace ?? "" 
+                });
             }
             else if (section == "DistributorsConferences")
             {
-                _context.DistributorsConferences.Add(new DistributorsConference { ConferenceYear = year, PublishingHouseName = houseName, Country = country, City = city, WhatsAppNumber = whatsapp, Email = email, ResponsiblePerson = person });
+                _context.DistributorsConferences.Add(new DistributorsConference 
+                { 
+                    ConferenceYear = year, 
+                    PublishingHouseName = houseName, 
+                    Country = country, 
+                    City = city, 
+                    WhatsAppNumber = whatsapp, 
+                    Email = email, 
+                    ResponsiblePerson = person 
+                });
             }
             else if (section == "NewYorkSessions")
             {
-                _context.NewYorkSessions.Add(new NewYorkSession { SessionYear = year, PublishingHouseName = houseName, Country = country, City = city, WhatsAppNumber = whatsapp, Email = email, ResponsiblePerson = person });
+                _context.NewYorkSessions.Add(new NewYorkSession 
+                { 
+                    SessionYear = year, 
+                    PublishingHouseName = houseName, 
+                    Country = country, 
+                    City = city, 
+                    WhatsAppNumber = whatsapp, 
+                    Email = email, 
+                    ResponsiblePerson = person 
+                });
             }
             else if (section == "PublishersConferences")
             {
-                _context.PublishersConferences.Add(new PublishersConference { ConferenceYear = year, PublishingHouseName = houseName, Country = country, City = city, WhatsAppNumber = whatsapp, Email = email, ResponsiblePerson = person });
+                _context.PublishersConferences.Add(new PublishersConference 
+                { 
+                    ConferenceYear = year, 
+                    PublishingHouseName = houseName, 
+                    Country = country, 
+                    City = city, 
+                    WhatsAppNumber = whatsapp, 
+                    Email = email, 
+                    ResponsiblePerson = person 
+                });
             }
             
             _context.SaveChanges();

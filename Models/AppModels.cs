@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<UserAccount> Users { get; set; }
     public DbSet<SharjahBookFair> SharjahBookFairs { get; set; }
@@ -15,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<PublishersConference> PublishersConferences { get; set; }
 }
 
+[Table("Users")]
 public class UserAccount
 {
     [Key]
@@ -23,6 +23,7 @@ public class UserAccount
     public string Password { get; set; } = string.Empty;
 }
 
+[Table("SharjahBookFairs")]
 public class SharjahBookFair
 {
     [Key]
@@ -36,9 +37,10 @@ public class SharjahBookFair
     public string ResponsiblePerson { get; set; } = string.Empty;
     public int BookCount { get; set; }
     public string Specialization { get; set; } = string.Empty;
-    public decimal RequiredSpace { get; set; }
+    public string RequiredSpace { get; set; } = string.Empty;
 }
 
+[Table("SharjahChildFestivals")]
 public class SharjahChildFestival
 {
     [Key]
@@ -51,9 +53,10 @@ public class SharjahChildFestival
     public string Email { get; set; } = string.Empty;
     public string ResponsiblePerson { get; set; } = string.Empty;
     public int BookCount { get; set; }
-    public decimal RequiredSpace { get; set; }
+    public string RequiredSpace { get; set; } = string.Empty;
 }
 
+[Table("DistributorsConferences")]
 public class DistributorsConference
 {
     [Key]
@@ -67,6 +70,7 @@ public class DistributorsConference
     public string ResponsiblePerson { get; set; } = string.Empty;
 }
 
+[Table("NewYorkSessions")]
 public class NewYorkSession
 {
     [Key]
@@ -80,6 +84,7 @@ public class NewYorkSession
     public string ResponsiblePerson { get; set; } = string.Empty;
 }
 
+[Table("PublishersConferences")]
 public class PublishersConference
 {
     [Key]
