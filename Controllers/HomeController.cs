@@ -89,10 +89,10 @@ namespace SharjahEventsWeb.Controllers
             var user = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
             if (user != null)
             {
-                HttpContext.Session.SetString("UserEmail", user.Email);
+                HttpContext.Session.SetString("UserEmail", email);
                 return RedirectToAction("Index");
             }
-            ModelState.AddModelError("", "البريد الإلكتروني أو كلمة المرور غير صحيحة");
+            ModelState.AddModelError("", "Invalid email or password.");
             return View();
         }
 
