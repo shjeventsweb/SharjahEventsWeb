@@ -14,14 +14,12 @@ namespace SharjahEventsWeb.Controllers
             _context = context;
         }
 
-        // صفحة تسجيل الدخول (عرض)
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
-        // معالجة تسجيل الدخول (طلب)
         [HttpPost]
         public IActionResult Login(string email, string password)
         {
@@ -35,14 +33,12 @@ namespace SharjahEventsWeb.Controllers
             return View();
         }
 
-        // تسجيل الخروج
         public IActionResult Logout()
         {
             HttpContext.Session.Remove("UserEmail");
             return RedirectToAction("Login");
         }
 
-        // لوحة التحكم الرئيسية مع دعم البحث وتمرير البيانات للتبويبات
         public IActionResult Index(string searchQuery)
         {
             if (HttpContext.Session.GetString("UserEmail") == null)
@@ -86,7 +82,6 @@ namespace SharjahEventsWeb.Controllers
             return View();
         }
 
-        // حفظ البيانات في الجدول المناسب
         [HttpPost]
         public IActionResult AddRecord(string section, int exhibitionYear, int festivalYear, int conferenceYear, int sessionYear, string publishingHouseName, string country, string city, string whatsAppNumber, string email, string responsiblePerson, int bookCount, string specialization, string requiredSpace)
         {
