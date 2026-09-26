@@ -28,8 +28,49 @@ namespace SharjahEventsWeb.Controllers
                 return RedirectToAction("Index");
             }
 
+            // التحقق من قاعدة البيانات للمستخدمين المسجلين الجدد
+            var dbUser = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
+            if (dbUser != null)
+            {
+                HttpContext.Session.SetString("UserEmail", email);
+                return RedirectToAction("Index");
+            }
+
             ModelState.AddModelError("", "البريد الإلكتروني أو كلمة المرور غير صحيحة.");
             return View();
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(string email, string password)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                ModelState.AddModelError("", "الرجاء إدخال البريد الإلكتروني وكلمة المرور.");
+                return View();
+            }
+
+            bool userExists = _context.Users.Any(u => u.Email == email);
+            if (userExists)
+            {
+                ModelState.AddModelError("", "البريد الإلكتروني مستخدم مسبقاً.");
+                return View();
+            }
+
+            _context.Users.Add(new UserAccount
+            {
+                Email = email,
+                Password = password
+            });
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.";
+            return RedirectToAction("Login");
         }
 
         public IActionResult Logout()
