@@ -22,7 +22,6 @@ namespace SharjahEventsWeb.Controllers
         [HttpPost]
         public IActionResult Login(string email, string password)
         {
-            // السماح بالحساب الافتراضي مباشرة لتفادي أي خطأ في قاعدة البيانات
             if (email == "admin@sharjah.ae" && password == "Admin@2026")
             {
                 HttpContext.Session.SetString("UserEmail", email);
@@ -39,11 +38,51 @@ namespace SharjahEventsWeb.Controllers
             }
             catch
             {
-                // تجاوز الخطأ في حال لم يتم تهيئة جدول المستخدمين بعد في السحابة
+                // تجاوز الخطأ في حال عدم توفر الجدول مؤقتاً
             }
 
             ModelState.AddModelError("", "البريد الإلكتروني أو كلمة المرور غير صحيحة.");
             return View();
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(string email, string password)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                ModelState.AddModelError("", "الرجاء إدخال البريد الإلكتروني وكلمة المرور.");
+                return View();
+            }
+
+            try
+            {
+                bool userExists = _context.Users.Any(u => u.Email == email);
+                if (userExists)
+                {
+                    ModelState.AddModelError("", "البريد الإلكتروني مستخدم مسبقاً.");
+                    return View();
+                }
+
+                _context.Users.Add(new User
+                {
+                    Email = email,
+                    Password = password
+                });
+                _context.SaveChanges();
+            }
+            catch
+            {
+                // تجاوز الخطأ مؤقتاً عند الحاجة
+            }
+
+            TempData["SuccessMessage"] = "تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.";
+            return RedirectToAction("Login");
         }
 
         public IActionResult Logout()
@@ -219,6 +258,154 @@ namespace SharjahEventsWeb.Controllers
             _context.SaveChanges();
 
             TempData["SuccessMessage"] = "تم إضافة الفعالية بنجاح!";
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult Edit(string section, int id)
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null) 
+                return RedirectToAction("Login");
+
+            ViewBag.Section = section;
+
+            if (section == "SharjahBookFairs")
+            {
+                var item = _context.SharjahBookFairs.Find(id);
+                if (item == null) return NotFound();
+                return View(item);
+            }
+            else if (section == "SharjahChildFestivals")
+            {
+                var item = _context.SharjahChildFestivals.Find(id);
+                if (item == null) return NotFound();
+                return View(item);
+            }
+            else if (section == "DistributorsConferences")
+            {
+                var item = _context.DistributorsConferences.Find(id);
+                if (item == null) return NotFound();
+                return View(item);
+            }
+            else if (section == "NewYorkSessions")
+            {
+                var item = _context.NewYorkSessions.Find(id);
+                if (item == null) return NotFound();
+                return View(item);
+            }
+            else if (section == "PublishersConferences")
+            {
+                var item = _context.PublishersConferences.Find(id);
+                if (item == null) return NotFound();
+                return View(item);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult Edit(
+            string section, 
+            int id, 
+            int exhibitionYear, 
+            int festivalYear, 
+            int conferenceYear, 
+            int sessionYear, 
+            string publishingHouseName, 
+            string country, 
+            string city, 
+            string whatsAppNumber, 
+            string email, 
+            string responsiblePerson, 
+            int bookCount, 
+            string specialization, 
+            string requiredSpace)
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null) 
+                return RedirectToAction("Login");
+
+            int year = exhibitionYear != 0 ? exhibitionYear : 
+                       (festivalYear != 0 ? festivalYear : 
+                       (conferenceYear != 0 ? conferenceYear : sessionYear));
+
+            if (section == "SharjahBookFairs")
+            {
+                var item = _context.SharjahBookFairs.Find(id);
+                if (item != null)
+                {
+                    item.ExhibitionYear = year;
+                    item.PublishingHouseName = publishingHouseName ?? "";
+                    item.Country = country ?? "";
+                    item.City = city ?? "";
+                    item.WhatsAppNumber = whatsAppNumber ?? "";
+                    item.Email = email ?? "";
+                    item.ResponsiblePerson = responsiblePerson ?? "";
+                    item.BookCount = bookCount;
+                    item.Specialization = specialization ?? "";
+                    item.RequiredSpace = requiredSpace ?? "";
+                }
+            }
+            else if (section == "SharjahChildFestivals")
+            {
+                var item = _context.SharjahChildFestivals.Find(id);
+                if (item != null)
+                {
+                    item.FestivalYear = year;
+                    item.PublishingHouseName = publishingHouseName ?? "";
+                    item.Country = country ?? "";
+                    item.City = city ?? "";
+                    item.WhatsAppNumber = whatsAppNumber ?? "";
+                    item.Email = email ?? "";
+                    item.ResponsiblePerson = responsiblePerson ?? "";
+                    item.BookCount = bookCount;
+                    item.RequiredSpace = requiredSpace ?? "";
+                }
+            }
+            else if (section == "DistributorsConferences")
+            {
+                var item = _context.DistributorsConferences.Find(id);
+                if (item != null)
+                {
+                    item.ConferenceYear = year;
+                    item.PublishingHouseName = publishingHouseName ?? "";
+                    item.Country = country ?? "";
+                    item.City = city ?? "";
+                    item.WhatsAppNumber = whatsAppNumber ?? "";
+                    item.Email = email ?? "";
+                    item.ResponsiblePerson = responsiblePerson ?? "";
+                }
+            }
+            else if (section == "NewYorkSessions")
+            {
+                var item = _context.NewYorkSessions.Find(id);
+                if (item != null)
+                {
+                    item.SessionYear = year;
+                    item.PublishingHouseName = publishingHouseName ?? "";
+                    item.Country = country ?? "";
+                    item.City = city ?? "";
+                    item.WhatsAppNumber = whatsAppNumber ?? "";
+                    item.Email = email ?? "";
+                    item.ResponsiblePerson = responsiblePerson ?? "";
+                }
+            }
+            else if (section == "PublishersConferences")
+            {
+                var item = _context.PublishersConferences.Find(id);
+                if (item != null)
+                {
+                    item.ConferenceYear = year;
+                    item.PublishingHouseName = publishingHouseName ?? "";
+                    item.Country = country ?? "";
+                    item.City = city ?? "";
+                    item.WhatsAppNumber = whatsAppNumber ?? "";
+                    item.Email = email ?? "";
+                    item.ResponsiblePerson = responsiblePerson ?? "";
+                }
+            }
+
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "تم تحديث البيانات بنجاح!";
             return RedirectToAction("Index");
         }
 

@@ -1,83 +1,81 @@
-@model dynamic
 @{
-    ViewData["Title"] = "تعديل السجل";
-    string secName = ViewBag.Section as string ?? "";
-    int id = ViewBag.Id;
-    bool isWorkshop = secName == "PublishersWorkshops" || secName == "DistributorsWorkshops";
-
-    // استخراج السنة الصحيحة حسب القسم لتجنب أي خطأ
-    int currentYear = 2026;
-    if (Model != null)
-    {
-        if (secName == "SharjahBookFairs") { currentYear = Model.ExhibitionYear; }
-        else if (secName == "SharjahChildFestivals") { currentYear = Model.FestivalYear; }
-        else if (secName == "DistributorsConferences" || secName == "PublishersConferences") { currentYear = Model.ConferenceYear; }
-        else if (secName == "NewYorkSessions") { currentYear = Model.SessionYear; }
-        else if (secName == "PublishersWorkshops" || secName == "DistributorsWorkshops") { currentYear = Model.WorkshopYear; }
-    }
+    ViewData["Title"] = "تعديل البيانات";
+    string section = ViewBag.Section as string;
 }
 
 <div class="container py-5" dir="rtl">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-lg border-0 rounded-4 p-4">
-                <h3 class="fw-bold text-dark mb-4 text-center">تعديل بيانات السجل</h3>
-                
+            <div class="card shadow-sm border-0 rounded-4 p-4 bg-white">
+                <h3 class="fw-bold mb-4 text-primary">✏️ تعديل بيانات السجل</h3>
+
                 <form asp-action="Edit" method="post">
-                    <input type="hidden" name="section" value="@secName" />
-                    <input type="hidden" name="id" value="@id" />
+                    <input type="hidden" name="section" value="@section" />
+                    <input type="hidden" name="id" value="@Model.Id" />
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">السنة</label>
-                        <input type="number" name="workshopYear" class="form-control form-control-lg" value="@currentYear" required />
+                        <input type="number" name="@(section == "SharjahBookFairs" ? "exhibitionYear" : section == "SharjahChildFestivals" ? "festivalYear" : "conferenceYear")" 
+                               value="@(section == "SharjahBookFairs" ? Model.ExhibitionYear : section == "SharjahChildFestivals" ? Model.FestivalYear : section == "DistributorsConferences" ? Model.ConferenceYear : section == "NewYorkSessions" ? Model.SessionYear : Model.ConferenceYear)" 
+                               class="form-control rounded-3" required />
                     </div>
-
-                    @if (isWorkshop)
-                    {
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">اسم المحاضر</label>
-                            <input type="text" name="lecturerName" class="form-control form-control-lg" value="@Model?.LecturerName" required />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">الدولة</label>
-                            <input type="text" name="country" class="form-control form-control-lg" value="@Model?.Country" required />
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">اسم دار النشر</label>
-                            <input type="text" name="publishingHouseName" class="form-control form-control-lg" value="@Model?.PublishingHouseName" required />
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">الدولة</label>
-                                <input type="text" name="country" class="form-control form-control-lg" value="@Model?.Country" required />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">المدينة</label>
-                                <input type="text" name="city" class="form-control form-control-lg" value="@Model?.City" required />
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">المسؤول</label>
-                            <input type="text" name="responsiblePerson" class="form-control form-control-lg" value="@Model?.ResponsiblePerson" />
-                        </div>
-                    }
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">رقم الجوال (واتساب)</label>
-                        <input type="text" name="whatsAppNumber" class="form-control form-control-lg" value="@Model?.WhatsAppNumber" dir="ltr" />
+                        <label class="form-label fw-bold">اسم دار النشر</label>
+                        <input type="text" name="publishingHouseName" value="@Model.PublishingHouseName" class="form-control rounded-3" required />
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">البريد الإلكتروني</label>
-                        <input type="email" name="email" class="form-control form-control-lg" value="@Model?.Email" dir="ltr" />
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">الدولة</label>
+                            <input type="text" name="country" value="@Model.Country" class="form-control rounded-3" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">المدينة</label>
+                            <input type="text" name="city" value="@Model.City" class="form-control rounded-3" />
+                        </div>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-warning btn-lg rounded-3 fw-bold text-dark">تحديث البيانات</button>
-                        <a href="/Home/Index?activeTab=@secName" class="btn btn-light btn-lg rounded-3">إلغاء والعودة</a>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">رقم الواتساب</label>
+                            <input type="text" name="whatsAppNumber" value="@Model.WhatsAppNumber" class="form-control rounded-3" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">الإيميل</label>
+                            <input type="email" name="email" value="@Model.Email" class="form-control rounded-3" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">المسؤول</label>
+                        <input type="text" name="responsiblePerson" value="@Model.ResponsiblePerson" class="form-control rounded-3" />
+                    </div>
+
+                    @if (section == "SharjahBookFairs" || section == "SharjahChildFestivals")
+                    {
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">عدد الإصدارات</label>
+                                <input type="number" name="bookCount" value="@Model.BookCount" class="form-control rounded-3" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">المساحة المطلوبة (م²)</label>
+                                <input type="text" name="requiredSpace" value="@Model.RequiredSpace" class="form-control rounded-3" />
+                            </div>
+                        </div>
+                        @if (section == "SharjahBookFairs")
+                        {
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">التخصص</label>
+                                <input type="text" name="specialization" value="@Model.Specialization" class="form-control rounded-3" />
+                            </div>
+                        }
+                    }
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold">حفظ التعديلات 💾</button>
+                        <a href="/Home/Index" class="btn btn-secondary px-4 rounded-pill fw-semibold">إلغاء 🔙</a>
                     </div>
                 </form>
             </div>
