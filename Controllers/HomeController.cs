@@ -13,71 +13,6 @@ namespace SharjahEventsWeb.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Login(string email, string password)
-        {
-            if (email == "admin@sharjah.ae" && password == "Admin@2026")
-            {
-                HttpContext.Session.SetString("UserEmail", email);
-                return RedirectToAction("Index");
-            }
-
-            var dbUser = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
-            if (dbUser != null)
-            {
-                HttpContext.Session.SetString("UserEmail", email);
-                return RedirectToAction("Index");
-            }
-
-            ModelState.AddModelError("", "Invalid credentials.");
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Register(string email, string password)
-        {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-            {
-                ModelState.AddModelError("", "Please enter email and password.");
-                return View();
-            }
-
-            bool userExists = _context.Users.Any(u => u.Email == email);
-            if (userExists)
-            {
-                ModelState.AddModelError("", "Email already exists.");
-                return View();
-            }
-
-            _context.Users.Add(new UserAccount
-            {
-                Email = email,
-                Password = password
-            });
-            _context.SaveChanges();
-
-            TempData["SuccessMessage"] = "Account created successfully!";
-            return RedirectToAction("Login");
-        }
-
-        public IActionResult Logout()
-        {
-            HttpContext.Session.Remove("UserEmail");
-            return RedirectToAction("Login");
-        }
-
         public IActionResult Index(string searchQuery)
         {
             if (HttpContext.Session.GetString("UserEmail") == null)
@@ -89,28 +24,49 @@ namespace SharjahEventsWeb.Controllers
 
             try
             {
-                var bookFairsQuery = _context.SharjahBookFairs.AsQueryable();
-                var childFestivalsQuery = _context.SharjahChildFestivals.AsQueryable();
-                var distributorsQuery = _context.DistributorsConferences.AsQueryable();
-                var newYorkQuery = _context.NewYorkSessions.AsQueryable();
-                var publishersConfQuery = _context.PublishersConferences.AsQueryable();
+                var bookFairs = _context.SharjahBookFairs.ToList();
+                var childFestivals = _context.SharjahChildFestivals.ToList();
+                var distributors = _context.DistributorsConferences.ToList();
+                var newYork = _context.NewYorkSessions.ToList();
+                var publishersConf = _context.PublishersConferences.ToList();
 
                 if (!string.IsNullOrEmpty(searchQuery))
                 {
-                    bookFairsQuery = bookFairsQuery.Where(x => 
-                        (!string.IsNullOrEmpty(x.PublishingHouseName) && x.PublishingHouseName.Contains(searchQuery)) || 
-                        (!string.IsNullOrEmpty(x.Country) && x.Country.Contains(searchQuery)) || 
-                        (!string.IsNullOrEmpty(x.City) && x.City.Contains(searchQuery)));
+                    bookFairs = bookFairs.Where(x => 
+                        (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || 
+                        (x.Country != null && x.Country.Contains(searchQuery)) || 
+                        (x.City != null && x.City.Contains(searchQuery))).ToList();
+
+                    childFestivals = childFestivals.Where(x => 
+                        (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || 
+                        (x.Country != null && x.Country.Contains(searchQuery)) || 
+                        (x.City != null && x.City.Contains(searchQuery))).ToList();
+
+                    distributors = distributors.Where(x => 
+                        (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || 
+                        (x.Country != null && x.Country.Contains(searchQuery)) || 
+                        (x.City != null && x.City.Contains(searchQuery))).ToList();
+
+                    newYork = newYork.Where(x => 
+                        (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || 
+                        (x.Country != null && x.Country.Contains(searchQuery)) || 
+                        (x.City != null && x.City.Contains(searchQuery))).ToList();
+
+                    publishersConf = publishersConf.Where(x => 
+                        (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || 
+                        (x.Country != null && x.Country.Contains(searchQuery)) || 
+                        (x.City != null && x.City.Contains(searchQuery))).ToList();
                 }
 
-                ViewBag.BookFairs = bookFairsQuery.ToList();
-                ViewBag.ChildFestivals = childFestivalsQuery.ToList();
-                ViewBag.Distributors = distributorsQuery.ToList();
-                ViewBag.NewYork = newYorkQuery.ToList();
-                ViewBag.PublishersConf = publishersConfQuery.ToList();
+                ViewBag.BookFairs = bookFairs;
+                ViewBag.ChildFestivals = childFestivals;
+                ViewBag.Distributors = distributors;
+                ViewBag.NewYork = newYork;
+                ViewBag.PublishersConf = publishersConf;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine("Error: " + ex.Message);
                 ViewBag.BookFairs = new List<SharjahBookFair>();
                 ViewBag.ChildFestivals = new List<SharjahChildFestival>();
                 ViewBag.Distributors = new List<DistributorsConference>();
@@ -122,93 +78,28 @@ namespace SharjahEventsWeb.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddRecord(string section)
+        public IActionResult Login()
         {
-            if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
-            ViewBag.Section = section;
             return View();
         }
 
         [HttpPost]
-        public IActionResult AddRecord(string section, int year, int exhibitionYear, int festivalYear, int conferenceYear, int sessionYear, string houseName, string publishingHouseName, string country, string city, string whatsapp, string whatsAppNumber, string email, string person, string responsiblePerson, int bookCount, string specialization, string requiredSpace)
+        public IActionResult Login(string email, string password)
         {
-            if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
+            var user = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
+            if (user != null)
+            {
+                HttpContext.Session.SetString("UserEmail", user.Email);
+                return RedirectToAction("Index");
+            }
+            ModelState.AddModelError("", "البريد الإلكتروني أو كلمة المرور غير صحيحة");
+            return View();
+        }
 
-            int finalYear = year != 0 ? year : (exhibitionYear != 0 ? exhibitionYear : (festivalYear != 0 ? festivalYear : (conferenceYear != 0 ? conferenceYear : sessionYear)));
-            string finalHouse = !string.IsNullOrEmpty(houseName) ? houseName : (publishingHouseName ?? "");
-            string finalPhone = !string.IsNullOrEmpty(whatsapp) ? whatsapp : (whatsAppNumber ?? "");
-            string finalPerson = !string.IsNullOrEmpty(person) ? person : (responsiblePerson ?? "");
-
-            if (section == "SharjahBookFairs")
-            {
-                _context.SharjahBookFairs.Add(new SharjahBookFair { 
-                    ExhibitionYear = finalYear, 
-                    PublishingHouseName = finalHouse, 
-                    Country = country ?? "", 
-                    City = city ?? "", 
-                    WhatsAppNumber = finalPhone, 
-                    Email = email ?? "", 
-                    ResponsiblePerson = finalPerson, 
-                    BookCount = bookCount, 
-                    Specialization = specialization ?? "", 
-                    RequiredSpace = requiredSpace ?? "" 
-                });
-            }
-            else if (section == "SharjahChildFestivals")
-            {
-                _context.SharjahChildFestivals.Add(new SharjahChildFestival { 
-                    FestivalYear = finalYear, 
-                    PublishingHouseName = finalHouse, 
-                    Country = country ?? "", 
-                    City = city ?? "", 
-                    WhatsAppNumber = finalPhone, 
-                    Email = email ?? "", 
-                    ResponsiblePerson = finalPerson, 
-                    BookCount = bookCount, 
-                    RequiredSpace = requiredSpace ?? "" 
-                });
-            }
-            else if (section == "DistributorsConferences")
-            {
-                _context.DistributorsConferences.Add(new DistributorsConference { 
-                    ConferenceYear = finalYear, 
-                    PublishingHouseName = finalHouse, 
-                    Country = country ?? "", 
-                    City = city ?? "", 
-                    WhatsAppNumber = finalPhone, 
-                    Email = email ?? "", 
-                    ResponsiblePerson = finalPerson 
-                });
-            }
-            else if (section == "NewYorkSessions")
-            {
-                _context.NewYorkSessions.Add(new NewYorkSession { 
-                    SessionYear = finalYear, 
-                    PublishingHouseName = finalHouse, 
-                    Country = country ?? "", 
-                    City = city ?? "", 
-                    WhatsAppNumber = finalPhone, 
-                    Email = email ?? "", 
-                    ResponsiblePerson = finalPerson 
-                });
-            }
-            else if (section == "PublishersConferences")
-            {
-                _context.PublishersConferences.Add(new PublishersConference { 
-                    ConferenceYear = finalYear, 
-                    PublishingHouseName = finalHouse, 
-                    Country = country ?? "", 
-                    City = city ?? "", 
-                    WhatsAppNumber = finalPhone, 
-                    Email = email ?? "", 
-                    ResponsiblePerson = finalPerson 
-                });
-            }
-            
-            _context.SaveChanges();
-
-            TempData["SuccessMessage"] = "Data saved successfully!";
-            return RedirectToAction("Index");
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
         }
     }
 }
