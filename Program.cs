@@ -2,18 +2,12 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// إجبار التطبيق على الاستماع على المنفذ 8080 المطلوب من Render
-builder.WebHost.UseUrls("http://0.0.0.0:8080");
-
-// 1. تسجيل قاعدة بيانات Supabase مع رفع مهلة الأوامر إلى 120 ثانية
+// تسجيل قاعدة البيانات
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
-        o => o.CommandTimeout(120)));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. إضافة الخدمات الأساسية
 builder.Services.AddControllersWithViews();
 
-// 3. تفعيل الـ Session لتسجيل الدخول
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -23,11 +17,18 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// 4. إنشاء الجداول تلقائياً في سحابة Supabase إذا لم تكن موجودة
-using (var scope = app.Services.CreateScope())
+// حماية عملية التحقق من قاعدة البيانات بمنع الانهيار (Exit 139)
+try
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.EnsureCreated();
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.EnsureCreated();
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Warning: Could not connect to database on startup: {ex.Message}");
 }
 
 app.UseHttpsRedirection();
@@ -35,9 +36,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// الترتيب الصحيح: يجب أن يكون UseSession قبل UseAuthorization دائماً
-app.UseSession();
 app.UseAuthorization();
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
