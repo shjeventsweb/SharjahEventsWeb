@@ -35,7 +35,7 @@ namespace SharjahEventsWeb.Controllers
                 return RedirectToAction("Index");
             }
 
-            ModelState.AddModelError("", "البريد الإلكتروني أو كلمة المرور غير صحيحة.");
+            ModelState.AddModelError("", "Invalid login credentials.");
             return View();
         }
 
@@ -50,14 +50,14 @@ namespace SharjahEventsWeb.Controllers
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                ModelState.AddModelError("", "الرجاء إدخال البريد الإلكتروني وكلمة المرور.");
+                ModelState.AddModelError("", "Please enter email and password.");
                 return View();
             }
 
             bool userExists = _context.Users.Any(u => u.Email == email);
             if (userExists)
             {
-                ModelState.AddModelError("", "البريد الإلكتروني مستخدم مسبقاً.");
+                ModelState.AddModelError("", "Email already exists.");
                 return View();
             }
 
@@ -68,7 +68,7 @@ namespace SharjahEventsWeb.Controllers
             });
             _context.SaveChanges();
 
-            TempData["SuccessMessage"] = "تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.";
+            TempData["SuccessMessage"] = "Account created successfully!";
             return RedirectToAction("Login");
         }
 
