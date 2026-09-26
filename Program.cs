@@ -36,8 +36,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
+// الترتيب الصحيح: Session يجب أن يكون قبل Authorization دائماً
 app.UseSession();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
