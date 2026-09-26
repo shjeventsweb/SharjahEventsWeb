@@ -91,7 +91,7 @@ namespace SharjahEventsWeb.Controllers
             return RedirectToAction("Login");
         }
 
-        public IActionResult Index(string searchQuery)
+        public IActionResult Index(string searchQuery, string activeTab)
         {
             if (HttpContext.Session.GetString("UserEmail") == null)
             {
@@ -99,6 +99,7 @@ namespace SharjahEventsWeb.Controllers
             }
 
             ViewBag.SearchQuery = searchQuery;
+            ViewBag.ActiveTab = string.IsNullOrEmpty(activeTab) ? "SharjahBookFairs" : activeTab;
 
             try
             {
@@ -258,7 +259,7 @@ namespace SharjahEventsWeb.Controllers
             _context.SaveChanges();
 
             TempData["SuccessMessage"] = "تم إضافة الفعالية بنجاح!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { activeTab = section });
         }
 
         [HttpGet]
@@ -406,7 +407,7 @@ namespace SharjahEventsWeb.Controllers
 
             _context.SaveChanges();
             TempData["SuccessMessage"] = "تم تحديث البيانات بنجاح!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { activeTab = section });
         }
 
         [HttpPost]
@@ -443,7 +444,7 @@ namespace SharjahEventsWeb.Controllers
 
             _context.SaveChanges();
             TempData["SuccessMessage"] = "تم حذف السجل بنجاح!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { activeTab = section });
         }
 
         [HttpPost]
@@ -475,7 +476,7 @@ namespace SharjahEventsWeb.Controllers
 
             _context.SaveChanges();
             TempData["SuccessMessage"] = "تم حذف جميع السجلات لهذا القسم بنجاح!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { activeTab = section });
         }
     }
 }
