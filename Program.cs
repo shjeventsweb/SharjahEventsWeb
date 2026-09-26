@@ -17,7 +17,10 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// حماية عملية التحقق من قاعدة البيانات بمنع الانهيار (Exit 139)
+// إظهار الخطأ التقني الحقيقي على الشاشة لمعرفة سبب الـ 500 فوراً
+app.UseDeveloperExceptionPage();
+
+// حماية عملية التحقق من قاعدة البيانات بمنع الانهيار
 try
 {
     using (var scope = app.Services.CreateScope())
@@ -36,7 +39,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// الترتيب الصحيح: Session يجب أن يكون قبل Authorization دائماً
 app.UseSession();
 app.UseAuthorization();
 
