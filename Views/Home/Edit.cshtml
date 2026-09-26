@@ -1,6 +1,6 @@
 @{
     ViewData["Title"] = "تعديل البيانات";
-    string section = ViewBag.Section as string;
+    string sec = ViewBag.Section as string ?? "";
 }
 
 <div class="container py-5" dir="rtl">
@@ -10,13 +10,13 @@
                 <h3 class="fw-bold mb-4 text-primary">✏️ تعديل بيانات السجل</h3>
 
                 <form asp-action="Edit" method="post">
-                    <input type="hidden" name="section" value="@section" />
+                    <input type="hidden" name="section" value="@sec" />
                     <input type="hidden" name="id" value="@Model.Id" />
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">السنة</label>
-                        <input type="number" name="@(section == "SharjahBookFairs" ? "exhibitionYear" : section == "SharjahChildFestivals" ? "festivalYear" : "conferenceYear")" 
-                               value="@(section == "SharjahBookFairs" ? Model.ExhibitionYear : section == "SharjahChildFestivals" ? Model.FestivalYear : section == "DistributorsConferences" ? Model.ConferenceYear : section == "NewYorkSessions" ? Model.SessionYear : Model.ConferenceYear)" 
+                        <input type="number" name="@(sec == "SharjahBookFairs" ? "exhibitionYear" : sec == "SharjahChildFestivals" ? "festivalYear" : "conferenceYear")" 
+                               value="@(sec == "SharjahBookFairs" ? Model.ExhibitionYear : sec == "SharjahChildFestivals" ? Model.FestivalYear : sec == "DistributorsConferences" ? Model.ConferenceYear : sec == "NewYorkSessions" ? Model.SessionYear : Model.ConferenceYear)" 
                                class="form-control rounded-3" required />
                     </div>
 
@@ -52,7 +52,7 @@
                         <input type="text" name="responsiblePerson" value="@Model.ResponsiblePerson" class="form-control rounded-3" />
                     </div>
 
-                    @if (section == "SharjahBookFairs" || section == "SharjahChildFestivals")
+                    @if (sec == "SharjahBookFairs" || sec == "SharjahChildFestivals")
                     {
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -64,7 +64,7 @@
                                 <input type="text" name="requiredSpace" value="@Model.RequiredSpace" class="form-control rounded-3" />
                             </div>
                         </div>
-                        @if (section == "SharjahBookFairs")
+                        @if (sec == "SharjahBookFairs")
                         {
                             <div class="mb-3">
                                 <label class="form-label fw-bold">التخصص</label>
