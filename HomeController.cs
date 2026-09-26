@@ -87,7 +87,6 @@ namespace SharjahEventsWeb.Controllers
 
             ViewBag.SearchQuery = searchQuery;
 
-            // جلب البيانات بشكل مباشر وآمن تماماً باستخدام LINQ
             try
             {
                 var bookFairsQuery = _context.SharjahBookFairs.AsQueryable();
@@ -131,20 +130,25 @@ namespace SharjahEventsWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddRecord(string section, int exhibitionYear, int festivalYear, int conferenceYear, int sessionYear, string publishingHouseName, string country, string city, string whatsAppNumber, string email, string responsiblePerson, int bookCount, string specialization, string requiredSpace)
+        public IActionResult AddRecord(string section, int year, int exhibitionYear, int festivalYear, int conferenceYear, int sessionYear, string houseName, string publishingHouseName, string country, string city, string whatsapp, string whatsAppNumber, string email, string person, string responsiblePerson, int bookCount, string specialization, string requiredSpace)
         {
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
+
+            int finalYear = year != 0 ? year : (exhibitionYear != 0 ? exhibitionYear : (festivalYear != 0 ? festivalYear : (conferenceYear != 0 ? conferenceYear : sessionYear)));
+            string finalHouse = !string.IsNullOrEmpty(houseName) ? houseName : (publishingHouseName ?? "");
+            string finalPhone = !string.IsNullOrEmpty(whatsapp) ? whatsapp : (whatsAppNumber ?? "");
+            string finalPerson = !string.IsNullOrEmpty(person) ? person : (responsiblePerson ?? "");
 
             if (section == "SharjahBookFairs")
             {
                 _context.SharjahBookFairs.Add(new SharjahBookFair { 
-                    ExhibitionYear = exhibitionYear, 
-                    PublishingHouseName = publishingHouseName ?? "", 
+                    ExhibitionYear = finalYear, 
+                    PublishingHouseName = finalHouse, 
                     Country = country ?? "", 
                     City = city ?? "", 
-                    WhatsAppNumber = whatsAppNumber ?? "", 
+                    WhatsAppNumber = finalPhone, 
                     Email = email ?? "", 
-                    ResponsiblePerson = responsiblePerson ?? "", 
+                    ResponsiblePerson = finalPerson, 
                     BookCount = bookCount, 
                     Specialization = specialization ?? "", 
                     RequiredSpace = requiredSpace ?? "" 
@@ -153,13 +157,13 @@ namespace SharjahEventsWeb.Controllers
             else if (section == "SharjahChildFestivals")
             {
                 _context.SharjahChildFestivals.Add(new SharjahChildFestival { 
-                    FestivalYear = festivalYear, 
-                    PublishingHouseName = publishingHouseName ?? "", 
+                    FestivalYear = finalYear, 
+                    PublishingHouseName = finalHouse, 
                     Country = country ?? "", 
                     City = city ?? "", 
-                    WhatsAppNumber = whatsAppNumber ?? "", 
+                    WhatsAppNumber = finalPhone, 
                     Email = email ?? "", 
-                    ResponsiblePerson = responsiblePerson ?? "", 
+                    ResponsiblePerson = finalPerson, 
                     BookCount = bookCount, 
                     RequiredSpace = requiredSpace ?? "" 
                 });
@@ -167,37 +171,37 @@ namespace SharjahEventsWeb.Controllers
             else if (section == "DistributorsConferences")
             {
                 _context.DistributorsConferences.Add(new DistributorsConference { 
-                    ConferenceYear = conferenceYear, 
-                    PublishingHouseName = publishingHouseName ?? "", 
+                    ConferenceYear = finalYear, 
+                    PublishingHouseName = finalHouse, 
                     Country = country ?? "", 
                     City = city ?? "", 
-                    WhatsAppNumber = whatsAppNumber ?? "", 
+                    WhatsAppNumber = finalPhone, 
                     Email = email ?? "", 
-                    ResponsiblePerson = responsiblePerson ?? "" 
+                    ResponsiblePerson = finalPerson 
                 });
             }
             else if (section == "NewYorkSessions")
             {
                 _context.NewYorkSessions.Add(new NewYorkSession { 
-                    SessionYear = sessionYear, 
-                    PublishingHouseName = publishingHouseName ?? "", 
+                    SessionYear = finalYear, 
+                    PublishingHouseName = finalHouse, 
                     Country = country ?? "", 
                     City = city ?? "", 
-                    WhatsAppNumber = whatsAppNumber ?? "", 
+                    WhatsAppNumber = finalPhone, 
                     Email = email ?? "", 
-                    ResponsiblePerson = responsiblePerson ?? "" 
+                    ResponsiblePerson = finalPerson 
                 });
             }
             else if (section == "PublishersConferences")
             {
                 _context.PublishersConferences.Add(new PublishersConference { 
-                    ConferenceYear = conferenceYear, 
-                    PublishingHouseName = publishingHouseName ?? "", 
+                    ConferenceYear = finalYear, 
+                    PublishingHouseName = finalHouse, 
                     Country = country ?? "", 
                     City = city ?? "", 
-                    WhatsAppNumber = whatsAppNumber ?? "", 
+                    WhatsAppNumber = finalPhone, 
                     Email = email ?? "", 
-                    ResponsiblePerson = responsiblePerson ?? "" 
+                    ResponsiblePerson = finalPerson 
                 });
             }
             
