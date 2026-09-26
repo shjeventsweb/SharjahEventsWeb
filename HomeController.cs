@@ -87,34 +87,31 @@ namespace SharjahEventsWeb.Controllers
 
             ViewBag.SearchQuery = searchQuery;
 
+            // جلب البيانات بشكل مباشر وآمن تماماً باستخدام LINQ
             try
             {
-                var allFairs = _context.SharjahBookFairs
-                    .FromSqlRaw("SELECT * FROM \"SharjahBookFairs\"")
-                    .ToList();
+                var bookFairsQuery = _context.SharjahBookFairs.AsQueryable();
+                var childFestivalsQuery = _context.SharjahChildFestivals.AsQueryable();
+                var distributorsQuery = _context.DistributorsConferences.AsQueryable();
+                var newYorkQuery = _context.NewYorkSessions.AsQueryable();
+                var publishersConfQuery = _context.PublishersConferences.AsQueryable();
 
                 if (!string.IsNullOrEmpty(searchQuery))
                 {
-                    ViewBag.BookFairs = allFairs
-                        .Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || 
-                                    (x.Country != null && x.Country.Contains(searchQuery)) || 
-                                    (x.City != null && x.City.Contains(searchQuery)))
-                        .ToList();
-                }
-                else
-                {
-                    ViewBag.BookFairs = allFairs;
+                    bookFairsQuery = bookFairsQuery.Where(x => 
+                        (!string.IsNullOrEmpty(x.PublishingHouseName) && x.PublishingHouseName.Contains(searchQuery)) || 
+                        (!string.IsNullOrEmpty(x.Country) && x.Country.Contains(searchQuery)) || 
+                        (!string.IsNullOrEmpty(x.City) && x.City.Contains(searchQuery)));
                 }
 
-                ViewBag.ChildFestivals = _context.SharjahChildFestivals.FromSqlRaw("SELECT * FROM \"SharjahChildFestivals\"").ToList();
-                ViewBag.Distributors = _context.DistributorsConferences.FromSqlRaw("SELECT * FROM \"DistributorsConferences\"").ToList();
-                ViewBag.NewYork = _context.NewYorkSessions.FromSqlRaw("SELECT * FROM \"NewYorkSessions\"").ToList();
-                ViewBag.PublishersConf = _context.PublishersConferences.FromSqlRaw("SELECT * FROM \"PublishersConferences\"").ToList();
+                ViewBag.BookFairs = bookFairsQuery.ToList();
+                ViewBag.ChildFestivals = childFestivalsQuery.ToList();
+                ViewBag.Distributors = distributorsQuery.ToList();
+                ViewBag.NewYork = newYorkQuery.ToList();
+                ViewBag.PublishersConf = publishersConfQuery.ToList();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine("Error: " + ex.Message);
-                
                 ViewBag.BookFairs = new List<SharjahBookFair>();
                 ViewBag.ChildFestivals = new List<SharjahChildFestival>();
                 ViewBag.Distributors = new List<DistributorsConference>();
