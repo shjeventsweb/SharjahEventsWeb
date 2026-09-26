@@ -78,7 +78,6 @@ namespace SharjahEventsWeb.Controllers
             return RedirectToAction("Login");
         }
 
-        // --- دالة عرض الجدول الرئيسية (Index) ---
         public IActionResult Index(string searchQuery)
         {
             if (HttpContext.Session.GetString("UserEmail") == null)
@@ -90,39 +89,32 @@ namespace SharjahEventsWeb.Controllers
 
             try
             {
+                var allFairs = _context.SharjahBookFairs
+                    .FromSqlRaw("SELECT * FROM \"SharjahBookFairs\"")
+                    .ToList();
+
                 if (!string.IsNullOrEmpty(searchQuery))
                 {
-                    ViewBag.BookFairs = _context.SharjahBookFairs
-                        .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
-                        .ToList() ?? new List<SharjahBookFair>();
-
-                    ViewBag.ChildFestivals = _context.SharjahChildFestivals
-                        .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
-                        .ToList() ?? new List<SharjahChildFestival>();
-
-                    ViewBag.Distributors = _context.DistributorsConferences
-                        .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
-                        .ToList() ?? new List<DistributorsConference>();
-
-                    ViewBag.NewYork = _context.NewYorkSessions
-                        .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
-                        .ToList() ?? new List<NewYorkSession>();
-
-                    ViewBag.PublishersConf = _context.PublishersConferences
-                        .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
-                        .ToList() ?? new List<PublishersConference>();
+                    ViewBag.BookFairs = allFairs
+                        .Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || 
+                                    (x.Country != null && x.Country.Contains(searchQuery)) || 
+                                    (x.City != null && x.City.Contains(searchQuery)))
+                        .ToList();
                 }
                 else
                 {
-                    ViewBag.BookFairs = _context.SharjahBookFairs.ToList() ?? new List<SharjahBookFair>();
-                    ViewBag.ChildFestivals = _context.SharjahChildFestivals.ToList() ?? new List<SharjahChildFestival>();
-                    ViewBag.Distributors = _context.DistributorsConferences.ToList() ?? new List<DistributorsConference>();
-                    ViewBag.NewYork = _context.NewYorkSessions.ToList() ?? new List<NewYorkSession>();
-                    ViewBag.PublishersConf = _context.PublishersConferences.ToList() ?? new List<PublishersConference>();
+                    ViewBag.BookFairs = allFairs;
                 }
+
+                ViewBag.ChildFestivals = _context.SharjahChildFestivals.FromSqlRaw("SELECT * FROM \"SharjahChildFestivals\"").ToList();
+                ViewBag.Distributors = _context.DistributorsConferences.FromSqlRaw("SELECT * FROM \"DistributorsConferences\"").ToList();
+                ViewBag.NewYork = _context.NewYorkSessions.FromSqlRaw("SELECT * FROM \"NewYorkSessions\"").ToList();
+                ViewBag.PublishersConf = _context.PublishersConferences.FromSqlRaw("SELECT * FROM \"PublishersConferences\"").ToList();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine("Error: " + ex.Message);
+                
                 ViewBag.BookFairs = new List<SharjahBookFair>();
                 ViewBag.ChildFestivals = new List<SharjahChildFestival>();
                 ViewBag.Distributors = new List<DistributorsConference>();
