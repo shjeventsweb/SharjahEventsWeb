@@ -207,7 +207,7 @@ namespace SharjahEventsWeb.Controllers
             
             _context.SaveChanges();
 
-            TempData["SuccessMessage"] = "Saved successfully!";
+            TempData["SuccessMessage"] = "Data saved successfully!";
             return RedirectToAction("Index");
         }
     }
