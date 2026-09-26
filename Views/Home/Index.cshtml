@@ -1,49 +1,296 @@
-﻿public IActionResult Index(string searchQuery)
-        {
-            if (HttpContext.Session.GetString("UserEmail") == null)
-            {
-                return RedirectToAction("Login");
-            }
+﻿@{
+    ViewData["Title"] = "لوحة التحكم - فعاليات الشارقة";
+    var bookFairs = ViewBag.BookFairs as List<SharjahEventsWeb.Models.SharjahBookFair> ?? new List<SharjahEventsWeb.Models.SharjahBookFair>();
+    var childFestivals = ViewBag.ChildFestivals as List<SharjahEventsWeb.Models.SharjahChildFestival> ?? new List<SharjahEventsWeb.Models.SharjahChildFestival>();
+    var distributors = ViewBag.Distributors as List<SharjahEventsWeb.Models.DistributorsConference> ?? new List<SharjahEventsWeb.Models.DistributorsConference>();
+    var newYork = ViewBag.NewYork as List<SharjahEventsWeb.Models.NewYorkSession> ?? new List<SharjahEventsWeb.Models.NewYorkSession>();
+    var publishersConf = ViewBag.PublishersConf as List<SharjahEventsWeb.Models.PublishersConference> ?? new List<SharjahEventsWeb.Models.PublishersConference>();
+    var publishersWorkshops = ViewBag.PublishersWorkshops as List<SharjahEventsWeb.Models.PublishersWorkshop> ?? new List<SharjahEventsWeb.Models.PublishersWorkshop>();
+    var distributorsWorkshops = ViewBag.DistributorsWorkshops as List<SharjahEventsWeb.Models.DistributorsWorkshop> ?? new List<SharjahEventsWeb.Models.DistributorsWorkshop>();
+    
+    string searchQuery = ViewBag.SearchQuery as string;
+    string activeTab = ViewBag.ActiveTab as string ?? "SharjahBookFairs";
 
-            ViewBag.SearchQuery = searchQuery;
+    int totalCount = bookFairs.Count + childFestivals.Count + distributors.Count + newYork.Count + publishersConf.Count + publishersWorkshops.Count + distributorsWorkshops.Count;
+}
 
-            try
-            {
-                // قراءة البيانات مباشرة من الجدول الحقيقي في قاعدة البيانات لتلافي أي اختلاف في الأسماء
-                var allFairs = _context.SharjahBookFairs
-                    .FromSqlRaw("SELECT * FROM \"SharjahBookFairs\"")
-                    .ToList();
+<style>
+    body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .main-header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border-radius: 1rem; padding: 2rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    .stat-card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease; border-right: 5px solid #0d6efd; }
+    .stat-card:hover { transform: translateY(-3px); }
+    .nav-pills .nav-link { border-radius: 0.75rem !important; font-weight: 600; padding: 0.75rem 1.25rem; color: #475569; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.2s ease-in-out; margin-left: 0.5rem; border: 1px solid #e2e8f0; margin-bottom: 0.5rem; }
+    .nav-pills .nav-link.active { background-color: #0d6efd !important; color: white !important; border-color: #0d6efd; }
+    .content-card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: none; }
+    .table thead th { background-color: #f8fafc; color: #334155; font-weight: 600; border-bottom: 2px solid #e2e8f0; padding: 1rem; }
+    .table tbody td { padding: 1rem; color: #475569; vertical-align: middle; }
+    .btn-action { border-radius: 50rem; padding: 0.375rem 1rem; font-size: 0.875rem; font-weight: 600; }
+</style>
 
-                if (!string.IsNullOrEmpty(searchQuery))
-                {
-                    ViewBag.BookFairs = allFairs
-                        .Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || 
-                                    (x.Country != null && x.Country.Contains(searchQuery)) || 
-                                    (x.City != null && x.City.Contains(searchQuery)))
-                        .ToList();
+<div class="container-fluid py-4 px-4" dir="rtl">
+    
+    <div class="main-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1 fs-3">🏛️ لوحة تحكم فعاليات الشارقة الثقافية</h1>
+            <p class="text-light opacity-75 mb-0">نظام الإدارة المركزي لقطاع النشر والفعاليات وورش العمل.</p>
+        </div>
+        <div>
+            <a href="/Home/Logout" class="btn btn-light text-danger px-4 rounded-pill fw-bold shadow-sm">تسجيل الخروج 🚪</a>
+        </div>
+    </div>
+
+    <!-- بطاقات الإحصائيات -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card" style="border-right-color: #0d6efd;">
+                <h6 class="text-muted mb-1">إجمالي السجلات</h6>
+                <h3 class="fw-bold mb-0 text-dark">@totalCount</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-right-color: #10b981;">
+                <h6 class="text-muted mb-1">معرض الكتاب</h6>
+                <h3 class="fw-bold mb-0 text-dark">@bookFairs.Count</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-right-color: #f59e0b;">
+                <h6 class="text-muted mb-1">إجمالي الورش</h6>
+                <h3 class="fw-bold mb-0 text-dark">@(publishersWorkshops.Count + distributorsWorkshops.Count)</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-right-color: #8b5cf6;">
+                <h6 class="text-muted mb-1">حالة النظام</h6>
+                <h3 class="fw-bold mb-0 text-success fs-5 mt-2">● متصل وآمن</h3>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- التبويبات -->
+    <ul class="nav nav-pills mb-4 flex-wrap" id="eventTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "SharjahBookFairs" ? "active" : "")" data-bs-toggle="pill" data-bs-target="#bookfair" data-section="SharjahBookFairs" type="button">📘 معرض الكتاب</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "SharjahChildFestivals" ? "active" : "")" data-bs-toggle="pill" data-bs-target="#child" data-section="SharjahChildFestivals" type="button">🎈 مهرجان الطفل</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "DistributorsConferences" ? "active" : "")" data-bs-toggle="pill" data-bs-target="#distributors" data-section="DistributorsConferences" type="button">🤝 مؤتمر الموزعين</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "NewYorkSessions" ? "active" : "")" data-bs-toggle="pill" data-bs-target="#newyork" data-section="NewYorkSessions" type="button">🗽 دورة نيويورك</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "PublishersConferences" ? "active" : "")" data-bs-toggle="pill" data-bs-target="#publishers" data-section="PublishersConferences" type="button">🏢 مؤتمر الناشرين</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "PublishersWorkshops" ? "active" : "")" data-bs-toggle="pill" data-bs-target="#p-workshops" data-section="PublishersWorkshops" type="button">👨‍🏫 ورش الناشرين</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "DistributorsWorkshops" ? "active" : "")" data-bs-toggle="pill" data-bs-target="#d-workshops" data-section="DistributorsWorkshops" type="button">🧑‍🏫 ورش الموزعين</button>
+        </li>
+    </ul>
+
+    <div class="tab-content card content-card p-4">
+        
+        <!-- 1. معرض الكتاب -->
+        <div class="tab-pane fade @(activeTab == "SharjahBookFairs" ? "show active" : "")" id="bookfair" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <h4 class="fw-bold text-primary mb-0">📘 معرض الشارقة الدولي للكتاب</h4>
+                <div class="d-flex gap-2">
+                    <a href="/Home/ExportToExcel?section=SharjahBookFairs" class="btn btn-success btn-action">📥 تحميل إكسل</a>
+                    <a href="/Home/AddRecord?section=SharjahBookFairs" class="btn btn-primary btn-action">＋ إضافة</a>
+                    <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');"><input type="hidden" name="section" value="SharjahBookFairs" /><button type="submit" class="btn btn-outline-danger btn-action">🗑️ حذف الكل</button></form>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإصدارات</th><th>التخصص</th><th>المساحة</th><th class="text-center">الإجراءات</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in bookFairs) {
+                            <tr>
+                                <td>@item.ExhibitionYear</td><td class="fw-bold">@item.PublishingHouseName</td><td>@item.Country / @item.City</td><td>@item.WhatsAppNumber</td><td>@item.Email</td><td>@item.ResponsiblePerson</td><td>@item.BookCount</td><td>@item.Specialization</td><td>@item.RequiredSpace م²</td>
+                                <td class="text-center"><a href="/Home/Edit?section=SharjahBookFairs&id=@item.Id" class="btn btn-sm btn-outline-warning rounded-pill px-3">تعديل ✏️</a> <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف السجل؟');"><input type="hidden" name="section" value="SharjahBookFairs" /><input type="hidden" name="id" value="@item.Id" /><button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">حذف 🗑️</button></form></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. مهرجان الطفل -->
+        <div class="tab-pane fade @(activeTab == "SharjahChildFestivals" ? "show active" : "")" id="child" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <h4 class="fw-bold text-success mb-0">🎈 مهرجان الشارقة القرائي للطفل</h4>
+                <div class="d-flex gap-2">
+                    <a href="/Home/ExportToExcel?section=SharjahChildFestivals" class="btn btn-success btn-action">📥 تحميل إكسل</a>
+                    <a href="/Home/AddRecord?section=SharjahChildFestivals" class="btn btn-success btn-action">＋ إضافة</a>
+                    <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');"><input type="hidden" name="section" value="SharjahChildFestivals" /><button type="submit" class="btn btn-outline-danger btn-action">🗑️ حذف الكل</button></form>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإصدارات</th><th>المساحة</th><th class="text-center">الإجراءات</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in childFestivals) {
+                            <tr>
+                                <td>@item.FestivalYear</td><td class="fw-bold">@item.PublishingHouseName</td><td>@item.Country / @item.City</td><td>@item.WhatsAppNumber</td><td>@item.Email</td><td>@item.ResponsiblePerson</td><td>@item.BookCount</td><td>@item.RequiredSpace م²</td>
+                                <td class="text-center"><a href="/Home/Edit?section=SharjahChildFestivals&id=@item.Id" class="btn btn-sm btn-outline-warning rounded-pill px-3">تعديل ✏️</a> <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف السجل؟');"><input type="hidden" name="section" value="SharjahChildFestivals" /><input type="hidden" name="id" value="@item.Id" /><button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">حذف 🗑️</button></form></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. مؤتمر الموزعين -->
+        <div class="tab-pane fade @(activeTab == "DistributorsConferences" ? "show active" : "")" id="distributors" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <h4 class="fw-bold text-warning mb-0">🤝 مؤتمر الموزعين</h4>
+                <div class="d-flex gap-2">
+                    <a href="/Home/ExportToExcel?section=DistributorsConferences" class="btn btn-success btn-action">📥 تحميل إكسل</a>
+                    <a href="/Home/AddRecord?section=DistributorsConferences" class="btn btn-warning btn-action text-dark fw-bold">＋ إضافة</a>
+                    <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');"><input type="hidden" name="section" value="DistributorsConferences" /><button type="submit" class="btn btn-outline-danger btn-action">🗑️ حذف الكل</button></form>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th class="text-center">الإجراءات</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in distributors) {
+                            <tr>
+                                <td>@item.ConferenceYear</td><td class="fw-bold">@item.PublishingHouseName</td><td>@item.Country / @item.City</td><td>@item.WhatsAppNumber</td><td>@item.Email</td><td>@item.ResponsiblePerson</td>
+                                <td class="text-center"><a href="/Home/Edit?section=DistributorsConferences&id=@item.Id" class="btn btn-sm btn-outline-warning rounded-pill px-3">تعديل ✏️</a> <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف السجل؟');"><input type="hidden" name="section" value="DistributorsConferences" /><input type="hidden" name="id" value="@item.Id" /><button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">حذف 🗑️</button></form></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4. دورة نيويورك -->
+        <div class="tab-pane fade @(activeTab == "NewYorkSessions" ? "show active" : "")" id="newyork" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <h4 class="fw-bold mb-0" style="color: #8b5cf6;">🗽 دورة نيويورك</h4>
+                <div class="d-flex gap-2">
+                    <a href="/Home/ExportToExcel?section=NewYorkSessions" class="btn btn-success btn-action">📥 تحميل إكسل</a>
+                    <a href="/Home/AddRecord?section=NewYorkSessions" class="btn btn-action text-white fw-bold" style="background-color: #8b5cf6;">＋ إضافة</a>
+                    <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');"><input type="hidden" name="section" value="NewYorkSessions" /><button type="submit" class="btn btn-outline-danger btn-action">🗑️ حذف الكل</button></form>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th class="text-center">الإجراءات</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in newYork) {
+                            <tr>
+                                <td>@item.SessionYear</td><td class="fw-bold">@item.PublishingHouseName</td><td>@item.Country / @item.City</td><td>@item.WhatsAppNumber</td><td>@item.Email</td><td>@item.ResponsiblePerson</td>
+                                <td class="text-center"><a href="/Home/Edit?section=NewYorkSessions&id=@item.Id" class="btn btn-sm btn-outline-warning rounded-pill px-3">تعديل ✏️</a> <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف السجل؟');"><input type="hidden" name="section" value="NewYorkSessions" /><input type="hidden" name="id" value="@item.Id" /><button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">حذف 🗑️</button></form></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. مؤتمر الناشرين -->
+        <div class="tab-pane fade @(activeTab == "PublishersConferences" ? "show active" : "")" id="publishers" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <h4 class="fw-bold mb-0" style="color: #f97316;">🏢 مؤتمر الناشرين</h4>
+                <div class="d-flex gap-2">
+                    <a href="/Home/ExportToExcel?section=PublishersConferences" class="btn btn-success btn-action">📥 تحميل إكسل</a>
+                    <a href="/Home/AddRecord?section=PublishersConferences" class="btn btn-action text-white fw-bold" style="background-color: #f97316;">＋ إضافة</a>
+                    <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');"><input type="hidden" name="section" value="PublishersConferences" /><button type="submit" class="btn btn-outline-danger btn-action">🗑️ حذف الكل</button></form>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th class="text-center">الإجراءات</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in publishersConf) {
+                            <tr>
+                                <td>@item.ConferenceYear</td><td class="fw-bold">@item.PublishingHouseName</td><td>@item.Country / @item.City</td><td>@item.WhatsAppNumber</td><td>@item.Email</td><td>@item.ResponsiblePerson</td>
+                                <td class="text-center"><a href="/Home/Edit?section=PublishersConferences&id=@item.Id" class="btn btn-sm btn-outline-warning rounded-pill px-3">تعديل ✏️</a> <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف السجل؟');"><input type="hidden" name="section" value="PublishersConferences" /><input type="hidden" name="id" value="@item.Id" /><button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">حذف 🗑️</button></form></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 6. ورش عمل مؤتمر الناشرين -->
+        <div class="tab-pane fade @(activeTab == "PublishersWorkshops" ? "show active" : "")" id="p-workshops" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <h4 class="fw-bold mb-0 text-primary">👨‍🏫 ورش عمل مؤتمر الناشرين</h4>
+                <div class="d-flex gap-2">
+                    <a href="/Home/ExportToExcel?section=PublishersWorkshops" class="btn btn-success btn-action">📥 تحميل إكسل</a>
+                    <a href="/Home/AddRecord?section=PublishersWorkshops" class="btn btn-primary btn-action">＋ إضافة ورشة</a>
+                    <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');"><input type="hidden" name="section" value="PublishersWorkshops" /><button type="submit" class="btn btn-outline-danger btn-action">🗑️ حذف الكل</button></form>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th class="text-center">الإجراءات</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in publishersWorkshops) {
+                            <tr>
+                                <td>@item.WorkshopYear</td><td class="fw-bold">@item.LecturerName</td><td>@item.Country</td><td>@item.WhatsAppNumber</td><td>@item.Email</td>
+                                <td class="text-center"><a href="/Home/Edit?section=PublishersWorkshops&id=@item.Id" class="btn btn-sm btn-outline-warning rounded-pill px-3">تعديل ✏️</a> <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف السجل؟');"><input type="hidden" name="section" value="PublishersWorkshops" /><input type="hidden" name="id" value="@item.Id" /><button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">حذف 🗑️</button></form></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 7. ورش عمل مؤتمر الموزعين -->
+        <div class="tab-pane fade @(activeTab == "DistributorsWorkshops" ? "show active" : "")" id="d-workshops" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <h4 class="fw-bold mb-0 text-success">🧑‍🏫 ورش عمل مؤتمر الموزعين</h4>
+                <div class="d-flex gap-2">
+                    <a href="/Home/ExportToExcel?section=DistributorsWorkshops" class="btn btn-success btn-action">📥 تحميل إكسل</a>
+                    <a href="/Home/AddRecord?section=DistributorsWorkshops" class="btn btn-success btn-action">＋ إضافة ورشة</a>
+                    <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');"><input type="hidden" name="section" value="DistributorsWorkshops" /><button type="submit" class="btn btn-outline-danger btn-action">🗑️ حذف الكل</button></form>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th class="text-center">الإجراءات</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in distributorsWorkshops) {
+                            <tr>
+                                <td>@item.WorkshopYear</td><td class="fw-bold">@item.LecturerName</td><td>@item.Country</td><td>@item.WhatsAppNumber</td><td>@item.Email</td>
+                                <td class="text-center"><a href="/Home/Edit?section=DistributorsWorkshops&id=@item.Id" class="btn btn-sm btn-outline-warning rounded-pill px-3">تعديل ✏️</a> <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف السجل؟');"><input type="hidden" name="section" value="DistributorsWorkshops" /><input type="hidden" name="id" value="@item.Id" /><button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">حذف 🗑️</button></form></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const triggerTabList = document.querySelectorAll('#eventTabs button');
+        triggerTabList.forEach(triggerEl => {
+            triggerEl.addEventListener('click', event => {
+                const sectionName = triggerEl.getAttribute('data-section');
+                const activeTabInput = document.getElementById('searchActiveTabInput');
+                if (activeTabInput && sectionName) {
+                    activeTabInput.value = sectionName;
                 }
-                else
-                {
-                    ViewBag.BookFairs = allFairs;
-                }
-
-                // بقية الجداول للأقسام الأخرى
-                ViewBag.ChildFestivals = _context.SharjahChildFestivals.FromSqlRaw("SELECT * FROM \"SharjahChildFestivals\"").ToList();
-                ViewBag.Distributors = _context.DistributorsConferences.FromSqlRaw("SELECT * FROM \"DistributorsConferences\"").ToList();
-                ViewBag.NewYork = _context.NewYorkSessions.FromSqlRaw("SELECT * FROM \"NewYorkSessions\"").ToList();
-                ViewBag.PublishersConf = _context.PublishersConferences.FromSqlRaw("SELECT * FROM \"PublishersConferences\"").ToList();
-            }
-            catch (Exception ex)
-            {
-                // للطباعة في حال وجود أي استثناء خفي
-                Console.WriteLine("Error: " + ex.Message);
-                
-                ViewBag.BookFairs = new List<SharjahBookFair>();
-                ViewBag.ChildFestivals = new List<SharjahChildFestival>();
-                ViewBag.Distributors = new List<DistributorsConference>();
-                ViewBag.NewYork = new List<NewYorkSession>();
-                ViewBag.PublishersConf = new List<PublishersConference>();
-            }
-
-            return View();
-        }
+            });
+        });
+    });
+</script>

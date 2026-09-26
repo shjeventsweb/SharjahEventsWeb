@@ -1,8 +1,0 @@
-# .gitignore
-[Bb]in/
-[Oo]bj/
-.DS_Store
-*.user
-*.suo
-.vs/
-.vscode/

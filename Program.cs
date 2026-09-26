@@ -1,13 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using SharjahEventsWeb.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// تسجيل قاعدة البيانات
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+// Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Configure SQLite Database
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Configure Session
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -17,21 +20,18 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// إظهار الخطأ التقني الحقيقي على الشاشة لمعرفة سبب الـ 500 فوراً
-app.UseDeveloperExceptionPage();
-
-// حماية عملية التحقق من قاعدة البيانات بمنع الانهيار
-try
+// Auto-create database and tables on startup
+using (var scope = app.Services.CreateScope())
 {
-    using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        db.Database.EnsureCreated();
-    }
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
 }
-catch (Exception ex)
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
 {
-    Console.WriteLine($"Warning: Could not connect to database on startup: {ex.Message}");
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
