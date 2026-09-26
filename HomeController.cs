@@ -28,7 +28,6 @@ namespace SharjahEventsWeb.Controllers
                 return RedirectToAction("Index");
             }
 
-            // التحقق من قاعدة البيانات للمستخدمين المسجلين الجدد
             var dbUser = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
             if (dbUser != null)
             {
@@ -79,6 +78,7 @@ namespace SharjahEventsWeb.Controllers
             return RedirectToAction("Login");
         }
 
+        // --- دالة عرض الجدول الرئيسية (Index) ---
         public IActionResult Index(string searchQuery)
         {
             if (HttpContext.Session.GetString("UserEmail") == null)
@@ -88,41 +88,51 @@ namespace SharjahEventsWeb.Controllers
 
             ViewBag.SearchQuery = searchQuery;
 
-            if (!string.IsNullOrEmpty(searchQuery))
+            try
             {
-                ViewBag.BookFairs = _context.SharjahBookFairs
-                    .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
-                    .ToList();
+                if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    ViewBag.BookFairs = _context.SharjahBookFairs
+                        .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
+                        .ToList() ?? new List<SharjahBookFair>();
 
-                ViewBag.ChildFestivals = _context.SharjahChildFestivals
-                    .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
-                    .ToList();
+                    ViewBag.ChildFestivals = _context.SharjahChildFestivals
+                        .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
+                        .ToList() ?? new List<SharjahChildFestival>();
 
-                ViewBag.Distributors = _context.DistributorsConferences
-                    .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
-                    .ToList();
+                    ViewBag.Distributors = _context.DistributorsConferences
+                        .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
+                        .ToList() ?? new List<DistributorsConference>();
 
-                ViewBag.NewYork = _context.NewYorkSessions
-                    .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
-                    .ToList();
+                    ViewBag.NewYork = _context.NewYorkSessions
+                        .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
+                        .ToList() ?? new List<NewYorkSession>();
 
-                ViewBag.PublishersConf = _context.PublishersConferences
-                    .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
-                    .ToList();
+                    ViewBag.PublishersConf = _context.PublishersConferences
+                        .Where(x => x.PublishingHouseName.Contains(searchQuery) || x.Country.Contains(searchQuery) || x.City.Contains(searchQuery))
+                        .ToList() ?? new List<PublishersConference>();
+                }
+                else
+                {
+                    ViewBag.BookFairs = _context.SharjahBookFairs.ToList() ?? new List<SharjahBookFair>();
+                    ViewBag.ChildFestivals = _context.SharjahChildFestivals.ToList() ?? new List<SharjahChildFestival>();
+                    ViewBag.Distributors = _context.DistributorsConferences.ToList() ?? new List<DistributorsConference>();
+                    ViewBag.NewYork = _context.NewYorkSessions.ToList() ?? new List<NewYorkSession>();
+                    ViewBag.PublishersConf = _context.PublishersConferences.ToList() ?? new List<PublishersConference>();
+                }
             }
-            else
+            catch (Exception)
             {
-                ViewBag.BookFairs = _context.SharjahBookFairs.ToList();
-                ViewBag.ChildFestivals = _context.SharjahChildFestivals.ToList();
-                ViewBag.Distributors = _context.DistributorsConferences.ToList();
-                ViewBag.NewYork = _context.NewYorkSessions.ToList();
-                ViewBag.PublishersConf = _context.PublishersConferences.ToList();
+                ViewBag.BookFairs = new List<SharjahBookFair>();
+                ViewBag.ChildFestivals = new List<SharjahChildFestival>();
+                ViewBag.Distributors = new List<DistributorsConference>();
+                ViewBag.NewYork = new List<NewYorkSession>();
+                ViewBag.PublishersConf = new List<PublishersConference>();
             }
 
             return View();
         }
 
-        // دالة عرض صفحة إضافة البيانات (GET)
         [HttpGet]
         public IActionResult AddRecord(string section)
         {
@@ -131,7 +141,6 @@ namespace SharjahEventsWeb.Controllers
             return View();
         }
 
-        // دالة حفظ البيانات المُرسلة (POST)
         [HttpPost]
         public IActionResult AddRecord(string section, int exhibitionYear, int festivalYear, int conferenceYear, int sessionYear, string publishingHouseName, string country, string city, string whatsAppNumber, string email, string responsiblePerson, int bookCount, string specialization, string requiredSpace)
         {
