@@ -6,6 +6,7 @@
     var newYork = ViewBag.NewYork as List<SharjahEventsWeb.Models.NewYorkSession>;
     var publishersConf = ViewBag.PublishersConf as List<SharjahEventsWeb.Models.PublishersConference>;
     string searchQuery = ViewBag.SearchQuery as string;
+    string activeTab = ViewBag.ActiveTab as string ?? "SharjahBookFairs";
 }
 
 <style>
@@ -45,6 +46,7 @@
     <!-- شريط البحث -->
     <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
         <form method="get" action="/Home/Index" class="row g-3 align-items-center">
+            <input type="hidden" name="activeTab" value="@activeTab" />
             <div class="col-md-10">
                 <input type="text" name="searchQuery" value="@searchQuery" class="form-control form-control-lg rounded-3" placeholder="ابحث باسم دار النشر، الدولة، أو المدينة..." />
             </div>
@@ -54,19 +56,19 @@
         </form>
     </div>
 
-    <!-- التبويبات -->
+    <!-- التبويبات النشطة بناءً على القسم -->
     <ul class="nav nav-pills mb-3 gap-2" id="eventTabs" role="tablist">
-        <li class="nav-item"><button class="nav-link tab-bookfair active shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#bookfair" type="button">📘 معرض الكتاب</button></li>
-        <li class="nav-item"><button class="nav-link tab-child shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#child" type="button">🎈 مهرجان الطفل</button></li>
-        <li class="nav-item"><button class="nav-link tab-distributors shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#distributors" type="button">🤝 مؤتمر الموزعين</button></li>
-        <li class="nav-item"><button class="nav-link tab-newyork shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#newyork" type="button">🗽 دورة نيويورك</button></li>
-        <li class="nav-item"><button class="nav-link tab-publishers shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#publishers" type="button">🏢 مؤتمر الناشرين</button></li>
+        <li class="nav-item"><button class="nav-link tab-bookfair @(activeTab == "SharjahBookFairs" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#bookfair" type="button">📘 معرض الكتاب</button></li>
+        <li class="nav-item"><button class="nav-link tab-child @(activeTab == "SharjahChildFestivals" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#child" type="button">🎈 مهرجان الطفل</button></li>
+        <li class="nav-item"><button class="nav-link tab-distributors @(activeTab == "DistributorsConferences" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#distributors" type="button">🤝 مؤتمر الموزعين</button></li>
+        <li class="nav-item"><button class="nav-link tab-newyork @(activeTab == "NewYorkSessions" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#newyork" type="button">🗽 دورة نيويورك</button></li>
+        <li class="nav-item"><button class="nav-link tab-publishers @(activeTab == "PublishersConferences" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#publishers" type="button">🏢 مؤتمر الناشرين</button></li>
     </ul>
 
     <div class="tab-content bg-white p-4 rounded-4 shadow-sm">
         
         <!-- 1. معرض الكتاب -->
-        <div class="tab-pane fade show active" id="bookfair" role="tabpanel">
+        <div class="tab-pane fade @(activeTab == "SharjahBookFairs" ? "show active" : "")" id="bookfair" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold text-primary">📘 معرض الشارقة الدولي للكتاب</h4>
                 <div>
@@ -96,7 +98,7 @@
                                     <td>@item.Specialization</td>
                                     <td>@item.RequiredSpace م²</td>
                                     <td>
-                                        <a href="/Home/Edit?section=SharjahBookFairs&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1 text-dark fw-bold">تعديل ✏️</a>
+                                        <a href="/Home/Edit?section=SharjahBookFairs&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا السجل؟');">
                                             <input type="hidden" name="section" value="SharjahBookFairs" />
                                             <input type="hidden" name="id" value="@item.Id" />
@@ -112,11 +114,11 @@
         </div>
 
         <!-- 2. مهرجان الطفل -->
-        <div class="tab-pane fade" id="child" role="tabpanel">
+        <div class="tab-pane fade @(activeTab == "SharjahChildFestivals" ? "show active" : "")" id="child" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold text-success">🎈 مهرجان الشارقة القرائي للطفل</h4>
                 <div>
-                    <a href="/Home/AddRecord?section=SharjahChildFestivals" class="btn btn-success rounded-pill px-3 fw-bold text-white">＋ إضافة</a>
+                    <a href="/Home/AddRecord?section=SharjahChildFestivals" class="btn btn-success rounded-pill px-3 fw-bold">＋ إضافة</a>
                     <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ تحذير: هل أنت متأكد من حذف جميع سجلات مهرجان الطفل؟');">
                         <input type="hidden" name="section" value="SharjahChildFestivals" />
                         <button type="submit" class="btn btn-outline-danger rounded-pill px-3 fw-bold">🗑️ حذف الكل</button>
@@ -141,7 +143,7 @@
                                     <td>@item.BookCount</td>
                                     <td>@item.RequiredSpace م²</td>
                                     <td>
-                                        <a href="/Home/Edit?section=SharjahChildFestivals&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1 text-dark fw-bold">تعديل ✏️</a>
+                                        <a href="/Home/Edit?section=SharjahChildFestivals&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا السجل؟');">
                                             <input type="hidden" name="section" value="SharjahChildFestivals" />
                                             <input type="hidden" name="id" value="@item.Id" />
@@ -157,7 +159,7 @@
         </div>
 
         <!-- 3. مؤتمر الموزعين -->
-        <div class="tab-pane fade" id="distributors" role="tabpanel">
+        <div class="tab-pane fade @(activeTab == "DistributorsConferences" ? "show active" : "")" id="distributors" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold text-warning">🤝 مؤتمر الموزعين</h4>
                 <div>
@@ -184,7 +186,7 @@
                                     <td>@item.Email</td>
                                     <td>@item.ResponsiblePerson</td>
                                     <td>
-                                        <a href="/Home/Edit?section=DistributorsConferences&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1 text-dark fw-bold">تعديل ✏️</a>
+                                        <a href="/Home/Edit?section=DistributorsConferences&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا السجل؟');">
                                             <input type="hidden" name="section" value="DistributorsConferences" />
                                             <input type="hidden" name="id" value="@item.Id" />
@@ -200,7 +202,7 @@
         </div>
 
         <!-- 4. دورة نيويورك -->
-        <div class="tab-pane fade" id="newyork" role="tabpanel">
+        <div class="tab-pane fade @(activeTab == "NewYorkSessions" ? "show active" : "")" id="newyork" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold" style="color: #6f42c1;">🗽 دورة نيويورك</h4>
                 <div>
@@ -227,7 +229,7 @@
                                     <td>@item.Email</td>
                                     <td>@item.ResponsiblePerson</td>
                                     <td>
-                                        <a href="/Home/Edit?section=NewYorkSessions&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1 text-dark fw-bold">تعديل ✏️</a>
+                                        <a href="/Home/Edit?section=NewYorkSessions&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا السجل؟');">
                                             <input type="hidden" name="section" value="NewYorkSessions" />
                                             <input type="hidden" name="id" value="@item.Id" />
@@ -243,7 +245,7 @@
         </div>
 
         <!-- 5. مؤتمر الناشرين -->
-        <div class="tab-pane fade" id="publishers" role="tabpanel">
+        <div class="tab-pane fade @(activeTab == "PublishersConferences" ? "show active" : "")" id="publishers" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold" style="color: #fd7e14;">🏢 مؤتمر الناشرين</h4>
                 <div>
@@ -270,7 +272,7 @@
                                     <td>@item.Email</td>
                                     <td>@item.ResponsiblePerson</td>
                                     <td>
-                                        <a href="/Home/Edit?section=PublishersConferences&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1 text-dark fw-bold">تعديل ✏️</a>
+                                        <a href="/Home/Edit?section=PublishersConferences&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا السجل؟');">
                                             <input type="hidden" name="section" value="PublishersConferences" />
                                             <input type="hidden" name="id" value="@item.Id" />
