@@ -478,5 +478,81 @@ namespace SharjahEventsWeb.Controllers
             TempData["SuccessMessage"] = "تم حذف جميع السجلات لهذا القسم بنجاح!";
             return RedirectToAction("Index", new { activeTab = section });
         }
+
+        [HttpGet]
+        public IActionResult ExportExcel(string section)
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null) 
+                return RedirectToAction("Login");
+
+            var builder = new System.Text.StringBuilder();
+            builder.Append('\uFEFF'); // BOM لتوافق الأحرف العربية مع Excel
+
+            string fileName = "Export.csv";
+
+            if (section == "SharjahBookFairs")
+            {
+                fileName = "SharjahBookFairs.csv";
+                builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الإصدارات,التخصص,المساحة");
+                var list = _context.SharjahBookFairs.ToList();
+                foreach (var item in list)
+                {
+                    builder.AppendLine($"{item.ExhibitionYear},{EscapeCsv(item.PublishingHouseName)},{EscapeCsv(item.Country)},{EscapeCsv(item.City)},{EscapeCsv(item.WhatsAppNumber)},{EscapeCsv(item.Email)},{EscapeCsv(item.ResponsiblePerson)},{item.BookCount},{EscapeCsv(item.Specialization)},{EscapeCsv(item.RequiredSpace)}");
+                }
+            }
+            else if (section == "SharjahChildFestivals")
+            {
+                fileName = "SharjahChildFestivals.csv";
+                builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الإصدارات,المساحة");
+                var list = _context.SharjahChildFestivals.ToList();
+                foreach (var item in list)
+                {
+                    builder.AppendLine($"{item.FestivalYear},{EscapeCsv(item.PublishingHouseName)},{EscapeCsv(item.Country)},{EscapeCsv(item.City)},{EscapeCsv(item.WhatsAppNumber)},{EscapeCsv(item.Email)},{EscapeCsv(item.ResponsiblePerson)},{item.BookCount},{EscapeCsv(item.RequiredSpace)}");
+                }
+            }
+            else if (section == "DistributorsConferences")
+            {
+                fileName = "DistributorsConferences.csv";
+                builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول");
+                var list = _context.DistributorsConferences.ToList();
+                foreach (var item in list)
+                {
+                    builder.AppendLine($"{item.ConferenceYear},{EscapeCsv(item.PublishingHouseName)},{EscapeCsv(item.Country)},{EscapeCsv(item.City)},{EscapeCsv(item.WhatsAppNumber)},{EscapeCsv(item.Email)},{EscapeCsv(item.ResponsiblePerson)}");
+                }
+            }
+            else if (section == "NewYorkSessions")
+            {
+                fileName = "NewYorkSessions.csv";
+                builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول");
+                var list = _context.NewYorkSessions.ToList();
+                foreach (var item in list)
+                {
+                    builder.AppendLine($"{item.SessionYear},{EscapeCsv(item.PublishingHouseName)},{EscapeCsv(item.Country)},{EscapeCsv(item.City)},{EscapeCsv(item.WhatsAppNumber)},{EscapeCsv(item.Email)},{EscapeCsv(item.ResponsiblePerson)}");
+                }
+            }
+            else if (section == "PublishersConferences")
+            {
+                fileName = "PublishersConferences.csv";
+                builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول");
+                var list = _context.PublishersConferences.ToList();
+                foreach (var item in list)
+                {
+                    builder.AppendLine($"{item.ConferenceYear},{EscapeCsv(item.PublishingHouseName)},{EscapeCsv(item.Country)},{EscapeCsv(item.City)},{EscapeCsv(item.WhatsAppNumber)},{EscapeCsv(item.Email)},{EscapeCsv(item.ResponsiblePerson)}");
+                }
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(builder.ToString());
+            return File(bytes, "text/csv", fileName);
+        }
+
+        private string EscapeCsv(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return "";
+            if (input.Contains(",") || input.Contains("\"") || input.Contains("\n"))
+            {
+                return "\"" + input.Replace("\"", "\"\"") + "\"";
+            }
+            return input;
+        }
     }
 }
