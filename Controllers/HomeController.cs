@@ -95,60 +95,9 @@ namespace SharjahEventsWeb.Controllers
             try { newYork = _context.NewYorkSessions.ToList(); } catch { }
             try { publishersConf = _context.PublishersConferences.ToList(); } catch { }
 
-            // جلب ورش الناشرين مع ضمان إنشاء جدول مؤقت أو إضافة سجل افتراضي فوري إن كان الجدول فارغاً
-            try 
-            { 
-                publishersWorkshops = _context.PublishersWorkshops.ToList(); 
-            } 
-            catch 
-            {
-                publishersWorkshops = new List<PublishersWorkshop>();
-            }
-
-            if (!publishersWorkshops.Any())
-            {
-                try
-                {
-                    var samplePW = new PublishersWorkshop { WorkshopYear = 2026, PublishingHouseName = "ورشة الناشرين التجريبية", Country = "الإمارات", WhatsAppNumber = "971500000000", Email = "pwork@sharjah.ae", ResponsiblePerson = "أحمد" };
-                    _context.PublishersWorkshops.Add(samplePW);
-                    _context.SaveChanges();
-                    publishersWorkshops = _context.PublishersWorkshops.ToList();
-                }
-                catch
-                {
-                    // بيانات افتراضية تظهر حتى لو فشل الاتصال بقاعدة البيانات للورشة لضمان رؤية البيانات للمستخدم
-                    publishersWorkshops = new List<PublishersWorkshop> {
-                        new PublishersWorkshop { Id = 1, WorkshopYear = 2026, PublishingHouseName = "ورشة الناشرين الافتراضية", Country = "الإمارات", WhatsAppNumber = "971500000000", Email = "demo@sharjah.ae", ResponsiblePerson = "مدير الورشة" }
-                    };
-                }
-            }
-
-            // جلب ورش الموزعين مع ضمان إضافة سجل افتراضي فوري إن كان الجدول فارغاً
-            try 
-            { 
-                distributorsWorkshops = _context.DistributorsWorkshops.ToList(); 
-            } 
-            catch 
-            {
-                distributorsWorkshops = new List<DistributorsWorkshop>();
-            }
-
-            if (!distributorsWorkshops.Any())
-            {
-                try
-                {
-                    var sampleDW = new DistributorsWorkshop { WorkshopYear = 2026, PublishingHouseName = "ورشة الموزعين التجريبية", Country = "الإمارات", WhatsAppNumber = "971500000000", Email = "dwork@sharjah.ae", ResponsiblePerson = "محمد" };
-                    _context.DistributorsWorkshops.Add(sampleDW);
-                    _context.SaveChanges();
-                    distributorsWorkshops = _context.DistributorsWorkshops.ToList();
-                }
-                catch
-                {
-                    distributorsWorkshops = new List<DistributorsWorkshop> {
-                        new DistributorsWorkshop { Id = 1, WorkshopYear = 2026, PublishingHouseName = "ورشة الموزعين الافتراضية", Country = "الإمارات", WhatsAppNumber = "971500000000", Email = "demo@sharjah.ae", ResponsiblePerson = "مدير الموزعين" }
-                    };
-                }
-            }
+            // جلب الورش بشكل آمن تماماً بدون أي محاولة حفظ إجباري قد تسبب خطأ قاعدة البيانات
+            try { publishersWorkshops = _context.PublishersWorkshops.ToList(); } catch { publishersWorkshops = new List<PublishersWorkshop>(); }
+            try { distributorsWorkshops = _context.DistributorsWorkshops.ToList(); } catch { distributorsWorkshops = new List<DistributorsWorkshop>(); }
 
             if (!string.IsNullOrEmpty(searchQuery))
             {
