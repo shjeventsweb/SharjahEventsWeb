@@ -83,16 +83,39 @@ namespace SharjahEventsWeb.Controllers
 
             try
             {
-                ViewBag.BookFairs = _context.SharjahBookFairs.ToList();
-                ViewBag.ChildFestivals = _context.SharjahChildFestivals.ToList();
-                ViewBag.Distributors = _context.DistributorsConferences.ToList();
-                ViewBag.NewYork = _context.NewYorkSessions.ToList();
-                ViewBag.PublishersConf = _context.PublishersConferences.ToList();
-                ViewBag.PublishersWorkshops = _context.PublishersWorkshops.ToList();
-                ViewBag.DistributorsWorkshops = _context.DistributorsWorkshops.ToList();
+                // التأكد من إنشاء الجداول تلقائياً في قاعدة البيانات إن لم تكن موجودة
+                _context.Database.EnsureCreated();
+
+                var bookFairs = _context.SharjahBookFairs.ToList();
+                var childFestivals = _context.SharjahChildFestivals.ToList();
+                var distributors = _context.DistributorsConferences.ToList();
+                var newYork = _context.NewYorkSessions.ToList();
+                var publishersConf = _context.PublishersConferences.ToList();
+                var publishersWorkshops = _context.PublishersWorkshops.ToList();
+                var distributorsWorkshops = _context.DistributorsWorkshops.ToList();
+
+                if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    bookFairs = bookFairs.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
+                    childFestivals = childFestivals.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
+                    distributors = distributors.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
+                    newYork = newYork.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
+                    publishersConf = publishersConf.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
+                    publishersWorkshops = publishersWorkshops.Where(x => (x.LecturerName != null && x.LecturerName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery))).ToList();
+                    distributorsWorkshops = distributorsWorkshops.Where(x => (x.LecturerName != null && x.LecturerName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery))).ToList();
+                }
+
+                ViewBag.BookFairs = bookFairs;
+                ViewBag.ChildFestivals = childFestivals;
+                ViewBag.Distributors = distributors;
+                ViewBag.NewYork = newYork;
+                ViewBag.PublishersConf = publishersConf;
+                ViewBag.PublishersWorkshops = publishersWorkshops;
+                ViewBag.DistributorsWorkshops = distributorsWorkshops;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine("Error: " + ex.Message);
                 ViewBag.BookFairs = new List<SharjahBookFair>();
                 ViewBag.ChildFestivals = new List<SharjahChildFestival>();
                 ViewBag.Distributors = new List<DistributorsConference>();
@@ -118,39 +141,47 @@ namespace SharjahEventsWeb.Controllers
         {
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
 
-            int year = exhibitionYear != 0 ? exhibitionYear : (festivalYear != 0 ? festivalYear : (conferenceYear != 0 ? conferenceYear : (sessionYear != 0 ? sessionYear : (workshopYear != 0 ? workshopYear : 2026))));
+            int year = workshopYear != 0 ? workshopYear : (exhibitionYear != 0 ? exhibitionYear : (festivalYear != 0 ? festivalYear : (conferenceYear != 0 ? conferenceYear : (sessionYear != 0 ? sessionYear : 2026))));
 
-            if (section == "SharjahBookFairs")
+            try
             {
-                _context.SharjahBookFairs.Add(new SharjahBookFair { ExhibitionYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "", BookCount = bookCount, Specialization = specialization ?? "", RequiredSpace = requiredSpace ?? "" });
+                if (section == "SharjahBookFairs")
+                {
+                    _context.SharjahBookFairs.Add(new SharjahBookFair { ExhibitionYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "", BookCount = bookCount, Specialization = specialization ?? "", RequiredSpace = requiredSpace ?? "" });
+                }
+                else if (section == "SharjahChildFestivals")
+                {
+                    _context.SharjahChildFestivals.Add(new SharjahChildFestival { FestivalYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "", BookCount = bookCount, RequiredSpace = requiredSpace ?? "" });
+                }
+                else if (section == "DistributorsConferences")
+                {
+                    _context.DistributorsConferences.Add(new DistributorsConference { ConferenceYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
+                }
+                else if (section == "NewYorkSessions")
+                {
+                    _context.NewYorkSessions.Add(new NewYorkSession { SessionYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
+                }
+                else if (section == "PublishersConferences")
+                {
+                    _context.PublishersConferences.Add(new PublishersConference { ConferenceYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
+                }
+                else if (section == "PublishersWorkshops")
+                {
+                    _context.PublishersWorkshops.Add(new PublishersWorkshop { WorkshopYear = year, LecturerName = lecturerName ?? "", Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "" });
+                }
+                else if (section == "DistributorsWorkshops")
+                {
+                    _context.DistributorsWorkshops.Add(new DistributorsWorkshop { WorkshopYear = year, LecturerName = lecturerName ?? "", Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "" });
+                }
+
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "تم إضافة السجل بنجاح!";
             }
-            else if (section == "SharjahChildFestivals")
+            catch (Exception ex)
             {
-                _context.SharjahChildFestivals.Add(new SharjahChildFestival { FestivalYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "", BookCount = bookCount, RequiredSpace = requiredSpace ?? "" });
-            }
-            else if (section == "DistributorsConferences")
-            {
-                _context.DistributorsConferences.Add(new DistributorsConference { ConferenceYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
-            }
-            else if (section == "NewYorkSessions")
-            {
-                _context.NewYorkSessions.Add(new NewYorkSession { SessionYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
-            }
-            else if (section == "PublishersConferences")
-            {
-                _context.PublishersConferences.Add(new PublishersConference { ConferenceYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
-            }
-            else if (section == "PublishersWorkshops")
-            {
-                _context.PublishersWorkshops.Add(new PublishersWorkshop { WorkshopYear = year, LecturerName = lecturerName ?? "", Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "" });
-            }
-            else if (section == "DistributorsWorkshops")
-            {
-                _context.DistributorsWorkshops.Add(new DistributorsWorkshop { WorkshopYear = year, LecturerName = lecturerName ?? "", Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "" });
+                TempData["SuccessMessage"] = "خطأ في الحفظ: " + ex.Message;
             }
 
-            _context.SaveChanges();
-            TempData["SuccessMessage"] = "تم إضافة السجل بنجاح!";
             return RedirectToAction("Index", new { activeTab = section });
         }
 
@@ -176,46 +207,54 @@ namespace SharjahEventsWeb.Controllers
         {
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
 
-            int year = exhibitionYear != 0 ? exhibitionYear : (festivalYear != 0 ? festivalYear : (conferenceYear != 0 ? conferenceYear : (sessionYear != 0 ? sessionYear : (workshopYear != 0 ? workshopYear : 2026))));
+            int year = workshopYear != 0 ? workshopYear : (exhibitionYear != 0 ? exhibitionYear : (festivalYear != 0 ? festivalYear : (conferenceYear != 0 ? conferenceYear : (sessionYear != 0 ? sessionYear : 2026))));
 
-            if (section == "SharjahBookFairs")
+            try
             {
-                var item = _context.SharjahBookFairs.Find(id);
-                if (item != null) { item.ExhibitionYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; item.BookCount = bookCount; item.Specialization = specialization ?? ""; item.RequiredSpace = requiredSpace ?? ""; }
+                if (section == "SharjahBookFairs")
+                {
+                    var item = _context.SharjahBookFairs.Find(id);
+                    if (item != null) { item.ExhibitionYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; item.BookCount = bookCount; item.Specialization = specialization ?? ""; item.RequiredSpace = requiredSpace ?? ""; }
+                }
+                else if (section == "SharjahChildFestivals")
+                {
+                    var item = _context.SharjahChildFestivals.Find(id);
+                    if (item != null) { item.FestivalYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; item.BookCount = bookCount; item.RequiredSpace = requiredSpace ?? ""; }
+                }
+                else if (section == "DistributorsConferences")
+                {
+                    var item = _context.DistributorsConferences.Find(id);
+                    if (item != null) { item.ConferenceYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; }
+                }
+                else if (section == "NewYorkSessions")
+                {
+                    var item = _context.NewYorkSessions.Find(id);
+                    if (item != null) { item.SessionYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; }
+                }
+                else if (section == "PublishersConferences")
+                {
+                    var item = _context.PublishersConferences.Find(id);
+                    if (item != null) { item.ConferenceYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; }
+                }
+                else if (section == "PublishersWorkshops")
+                {
+                    var item = _context.PublishersWorkshops.Find(id);
+                    if (item != null) { item.WorkshopYear = year; item.LecturerName = lecturerName ?? ""; item.Country = country ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; }
+                }
+                else if (section == "DistributorsWorkshops")
+                {
+                    var item = _context.DistributorsWorkshops.Find(id);
+                    if (item != null) { item.WorkshopYear = year; item.LecturerName = lecturerName ?? ""; item.Country = country ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; }
+                }
+
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "تم تحديث البيانات بنجاح!";
             }
-            else if (section == "SharjahChildFestivals")
+            catch (Exception ex)
             {
-                var item = _context.SharjahChildFestivals.Find(id);
-                if (item != null) { item.FestivalYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; item.BookCount = bookCount; item.RequiredSpace = requiredSpace ?? ""; }
-            }
-            else if (section == "DistributorsConferences")
-            {
-                var item = _context.DistributorsConferences.Find(id);
-                if (item != null) { item.ConferenceYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; }
-            }
-            else if (section == "NewYorkSessions")
-            {
-                var item = _context.NewYorkSessions.Find(id);
-                if (item != null) { item.SessionYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; }
-            }
-            else if (section == "PublishersConferences")
-            {
-                var item = _context.PublishersConferences.Find(id);
-                if (item != null) { item.ConferenceYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; }
-            }
-            else if (section == "PublishersWorkshops")
-            {
-                var item = _context.PublishersWorkshops.Find(id);
-                if (item != null) { item.WorkshopYear = year; item.LecturerName = lecturerName ?? ""; item.Country = country ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; }
-            }
-            else if (section == "DistributorsWorkshops")
-            {
-                var item = _context.DistributorsWorkshops.Find(id);
-                if (item != null) { item.WorkshopYear = year; item.LecturerName = lecturerName ?? ""; item.Country = country ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; }
+                TempData["SuccessMessage"] = "خطأ في التحديث: " + ex.Message;
             }
 
-            _context.SaveChanges();
-            TempData["SuccessMessage"] = "تم تحديث البيانات بنجاح!";
             return RedirectToAction("Index", new { activeTab = section });
         }
 
