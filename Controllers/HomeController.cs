@@ -94,8 +94,43 @@ namespace SharjahEventsWeb.Controllers
             try { distributors = _context.DistributorsConferences.ToList(); } catch { }
             try { newYork = _context.NewYorkSessions.ToList(); } catch { }
             try { publishersConf = _context.PublishersConferences.ToList(); } catch { }
-            try { publishersWorkshops = _context.PublishersWorkshops.ToList(); } catch { }
-            try { distributorsWorkshops = _context.DistributorsWorkshops.ToList(); } catch { }
+
+            // جلب ورش الناشرين مع إضافة سجل افتراضي لو كانت فارغة لتظهر في الجدول مباشرة
+            try 
+            { 
+                publishersWorkshops = _context.PublishersWorkshops.ToList(); 
+                if (!publishersWorkshops.Any())
+                {
+                    _context.PublishersWorkshops.Add(new PublishersWorkshop { WorkshopYear = 2026, PublishingHouseName = "ورشة الناشرين التجريبية", Country = "الإمارات", WhatsAppNumber = "971500000000", Email = "pwork@sharjah.ae", ResponsiblePerson = "أحمد" });
+                    _context.SaveChanges();
+                    publishersWorkshops = _context.PublishersWorkshops.ToList();
+                }
+            } 
+            catch { }
+
+            // جلب ورش الموزعين مع إضافة سجل افتراضي لو كانت فارغة
+            try 
+            { 
+                distributorsWorkshops = _context.DistributorsWorkshops.ToList(); 
+                if (!distributorsWorkshops.Any())
+                {
+                    _context.DistributorsWorkshops.Add(new DistributorsWorkshop { WorkshopYear = 2026, PublishingHouseName = "ورشة الموزعين التجريبية", Country = "الإمارات", WhatsAppNumber = "971500000000", Email = "dwork@sharjah.ae", ResponsiblePerson = "محمد" });
+                    _context.SaveChanges();
+                    distributorsWorkshops = _context.DistributorsWorkshops.ToList();
+                }
+            } 
+            catch { }
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                bookFairs = bookFairs.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
+                childFestivals = childFestivals.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
+                distributors = distributors.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
+                newYork = newYork.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
+                publishersConf = publishersConf.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
+                publishersWorkshops = publishersWorkshops.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery))).ToList();
+                distributorsWorkshops = distributorsWorkshops.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery))).ToList();
+            }
 
             ViewBag.BookFairs = bookFairs;
             ViewBag.ChildFestivals = childFestivals;
@@ -147,11 +182,11 @@ namespace SharjahEventsWeb.Controllers
                 }
                 else if (section == "PublishersWorkshops")
                 {
-                    _context.PublishersWorkshops.Add(new PublishersWorkshop { WorkshopYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
+                    _context.PublishersWorkshops.Add(new PublishersWorkshop { WorkshopYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
                 }
                 else if (section == "DistributorsWorkshops")
                 {
-                    _context.DistributorsWorkshops.Add(new DistributorsWorkshop { WorkshopYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
+                    _context.DistributorsWorkshops.Add(new DistributorsWorkshop { WorkshopYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
                 }
 
                 _context.SaveChanges();
@@ -228,7 +263,7 @@ namespace SharjahEventsWeb.Controllers
                 else if (section == "DistributorsWorkshops")
                 {
                     var item = _context.DistributorsWorkshops.Find(id);
-                    if (item != null) { item.WorkshopYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; }
+                    if (item != null) { item.WorkshopYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; }
                 }
 
                 _context.SaveChanges();
