@@ -90,7 +90,6 @@ namespace SharjahEventsWeb.Controllers
             try 
             { 
                 bookFairs = _context.SharjahBookFairs.ToList(); 
-                // إذا كانت القائمة فارغة، نضع سجلاً تجريبياً لكي نتاكد أن العرض يعمل
                 if (!bookFairs.Any())
                 {
                     _context.SharjahBookFairs.Add(new SharjahBookFair { ExhibitionYear = 2026, PublishingHouseName = "دار الشارقة التجريبية", Country = "الإمارات", City = "الشارقة", WhatsAppNumber = "971500000000", Email = "test@sharjah.ae", ResponsiblePerson = "أحمد", BookCount = 10, Specialization = "عام", RequiredSpace = "12م²" });
@@ -100,10 +99,53 @@ namespace SharjahEventsWeb.Controllers
             } 
             catch { }
 
-            try { childFestivals = _context.SharjahChildFestivals.ToList(); } catch { }
-            try { distributors = _context.DistributorsConferences.ToList(); } catch { }
-            try { newYork = _context.NewYorkSessions.ToList(); } catch { }
-            try { publishersConf = _context.PublishersConferences.ToList(); } catch { }
+            try 
+            { 
+                childFestivals = _context.SharjahChildFestivals.ToList(); 
+                if (!childFestivals.Any())
+                {
+                    _context.SharjahChildFestivals.Add(new SharjahChildFestival { FestivalYear = 2026, PublishingHouseName = "دار الطفل التجريبية", Country = "الإمارات", City = "الشارقة", WhatsAppNumber = "971500000000", Email = "child@sharjah.ae", ResponsiblePerson = "فاطمة", BookCount = 5, RequiredSpace = "9م²" });
+                    _context.SaveChanges();
+                    childFestivals = _context.SharjahChildFestivals.ToList();
+                }
+            } 
+            catch { }
+
+            try 
+            { 
+                distributors = _context.DistributorsConferences.ToList(); 
+                if (!distributors.Any())
+                {
+                    _context.DistributorsConferences.Add(new DistributorsConference { ConferenceYear = 2026, PublishingHouseName = "مؤسسة التوزيع التجريبية", Country = "الإمارات", City = "دبي", WhatsAppNumber = "971500000000", Email = "dist@sharjah.ae", ResponsiblePerson = "محمد" });
+                    _context.SaveChanges();
+                    distributors = _context.DistributorsConferences.ToList();
+                }
+            } 
+            catch { }
+
+            try 
+            { 
+                newYork = _context.NewYorkSessions.ToList(); 
+                if (!newYork.Any())
+                {
+                    _context.NewYorkSessions.Add(new NewYorkSession { SessionYear = 2026, PublishingHouseName = "دار نيويورك التجريبية", Country = "الولايات المتحدة", City = "نيويورك", WhatsAppNumber = "15000000000", Email = "ny@sharjah.ae", ResponsiblePerson = "جون" });
+                    _context.SaveChanges();
+                    newYork = _context.NewYorkSessions.ToList();
+                }
+            } 
+            catch { }
+
+            try 
+            { 
+                publishersConf = _context.PublishersConferences.ToList(); 
+                if (!publishersConf.Any())
+                {
+                    _context.PublishersConferences.Add(new PublishersConference { ConferenceYear = 2026, PublishingHouseName = "مؤتمر الناشرين التجريبي", Country = "الإمارات", City = "الشارقة", WhatsAppNumber = "971500000000", Email = "pub@sharjah.ae", ResponsiblePerson = "سعيد" });
+                    _context.SaveChanges();
+                    publishersConf = _context.PublishersConferences.ToList();
+                }
+            } 
+            catch { }
 
             var publishersWorkshops = new List<PublishersWorkshop>();
             var distributorsWorkshops = new List<DistributorsWorkshop>();

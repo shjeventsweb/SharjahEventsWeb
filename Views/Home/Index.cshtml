@@ -5,8 +5,6 @@
     var distributors = ViewBag.Distributors as List<SharjahEventsWeb.Models.DistributorsConference>;
     var newYork = ViewBag.NewYork as List<SharjahEventsWeb.Models.NewYorkSession>;
     var publishersConf = ViewBag.PublishersConf as List<SharjahEventsWeb.Models.PublishersConference>;
-    var publishersWorkshops = ViewBag.PublishersWorkshops as List<SharjahEventsWeb.Models.PublishersWorkshop>;
-    var distributorsWorkshops = ViewBag.DistributorsWorkshops as List<SharjahEventsWeb.Models.DistributorsWorkshop>;
 
     string searchQuery = ViewBag.SearchQuery as string;
     string activeTab = ViewBag.ActiveTab as string ?? "SharjahBookFairs";
@@ -18,8 +16,6 @@
     .tab-distributors { background-color: #ffc107 !important; color: #000 !important; }
     .tab-newyork { background-color: #6f42c1 !important; color: white !important; }
     .tab-publishers { background-color: #fd7e14 !important; color: white !important; }
-    .tab-pworkshop { background-color: #0dcaf0 !important; color: #000 !important; }
-    .tab-dworkshop { background-color: #20c997 !important; color: white !important; }
 
     .nav-pills .nav-link {
         border-radius: 50rem !important;
@@ -34,7 +30,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-4 rounded-4 shadow-sm">
         <div>
             <h2 class="fw-bold text-dark mb-1">لوحة إدارة فعاليات الشارقة الثقافية</h2>
-            <p class="text-muted mb-0">إدارة دور النشر والفعاليات وورش العمل وتصدير التقارير.</p>
+            <p class="text-muted mb-0">إدارة دور النشر والفعاليات وتصدير التقارير.</p>
         </div>
         <div>
             <a href="/Home/Logout" class="btn btn-outline-danger px-4 rounded-pill fw-semibold">تسجيل الخروج 🚪</a>
@@ -54,7 +50,7 @@
         <form method="get" action="/Home/Index" class="row g-3 align-items-center">
             <input type="hidden" name="activeTab" value="@activeTab" />
             <div class="col-md-10">
-                <input type="text" name="searchQuery" value="@searchQuery" class="form-control form-control-lg rounded-3" placeholder="ابحث باسم دار النشر، الدولة، المدينة، أو المحاضر..." />
+                <input type="text" name="searchQuery" value="@searchQuery" class="form-control form-control-lg rounded-3" placeholder="ابحث باسم دار النشر، الدولة، المدينة..." />
             </div>
             <div class="col-md-2 d-grid">
                 <button type="submit" class="btn btn-dark btn-lg rounded-3 fw-bold">بحث 🔍</button>
@@ -69,8 +65,6 @@
         <li class="nav-item"><button class="nav-link tab-distributors @(activeTab == "DistributorsConferences" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#distributors" type="button">🤝 مؤتمر الموزعين</button></li>
         <li class="nav-item"><button class="nav-link tab-newyork @(activeTab == "NewYorkSessions" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#newyork" type="button">🗽 دورة نيويورك</button></li>
         <li class="nav-item"><button class="nav-link tab-publishers @(activeTab == "PublishersConferences" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#publishers" type="button">🏢 مؤتمر الناشرين</button></li>
-        <li class="nav-item"><button class="nav-link tab-pworkshop @(activeTab == "PublishersWorkshops" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#pworkshop" type="button">👨‍🏫 ورش الناشرين</button></li>
-        <li class="nav-item"><button class="nav-link tab-dworkshop @(activeTab == "DistributorsWorkshops" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#dworkshop" type="button">🧑‍‍🏫 ورش الموزعين</button></li>
     </ul>
 
     <div class="tab-content bg-white p-4 rounded-4 shadow-sm">
@@ -84,7 +78,7 @@
                     <a href="/Home/ExportExcel?section=SharjahBookFairs" class="btn btn-success rounded-pill px-3 fw-bold">📊 تصدير إكسل</a>
                     <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');">
                         <input type="hidden" name="section" value="SharjahBookFairs" />
-                        <button type="submit" class="btn btn-outline-danger rounded-pill px-3 fw-bold">🗑️ حذف الكل</button>
+                        <button type="submit" class="btn btn-outline-danger rounded-pill px-3 fw-bold">🗑️️ حذف الكل</button>
                     </form>
                 </div>
             </div>
@@ -94,7 +88,7 @@
                         <tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإصدارات</th><th>التخصص</th><th>المساحة</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
-                        @if (bookFairs != null) {
+                        @if (bookFairs != null && bookFairs.Any()) {
                             @foreach (var item in bookFairs) {
                                 <tr>
                                     <td>@item.ExhibitionYear</td>
@@ -105,7 +99,7 @@
                                     <td>@item.ResponsiblePerson</td>
                                     <td>@item.BookCount</td>
                                     <td>@item.Specialization</td>
-                                    <td>@item.RequiredSpace م²</td>
+                                    <td>@item.RequiredSpace</td>
                                     <td>
                                         <a href="/Home/Edit?section=SharjahBookFairs&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
@@ -116,6 +110,8 @@
                                     </td>
                                 </tr>
                             }
+                        } else {
+                            <tr><td colspan="10" class="text-center text-muted py-4">لا توجد بيانات متاحة حالياً.</td></tr>
                         }
                     </tbody>
                 </table>
@@ -141,7 +137,7 @@
                         <tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإصدارات</th><th>المساحة</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
-                        @if (childFestivals != null) {
+                        @if (childFestivals != null && childFestivals.Any()) {
                             @foreach (var item in childFestivals) {
                                 <tr>
                                     <td>@item.FestivalYear</td>
@@ -151,7 +147,7 @@
                                     <td>@item.Email</td>
                                     <td>@item.ResponsiblePerson</td>
                                     <td>@item.BookCount</td>
-                                    <td>@item.RequiredSpace م²</td>
+                                    <td>@item.RequiredSpace</td>
                                     <td>
                                         <a href="/Home/Edit?section=SharjahChildFestivals&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
@@ -162,6 +158,8 @@
                                     </td>
                                 </tr>
                             }
+                        } else {
+                            <tr><td colspan="9" class="text-center text-muted py-4">لا توجد بيانات متاحة حالياً.</td></tr>
                         }
                     </tbody>
                 </table>
@@ -187,7 +185,7 @@
                         <tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
-                        @if (distributors != null) {
+                        @if (distributors != null && distributors.Any()) {
                             @foreach (var item in distributors) {
                                 <tr>
                                     <td>@item.ConferenceYear</td>
@@ -206,6 +204,8 @@
                                     </td>
                                 </tr>
                             }
+                        } else {
+                            <tr><td colspan="7" class="text-center text-muted py-4">لا توجد بيانات متاحة حالياً.</td></tr>
                         }
                     </tbody>
                 </table>
@@ -231,7 +231,7 @@
                         <tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
-                        @if (newYork != null) {
+                        @if (newYork != null && newYork.Any()) {
                             @foreach (var item in newYork) {
                                 <tr>
                                     <td>@item.SessionYear</td>
@@ -250,6 +250,8 @@
                                     </td>
                                 </tr>
                             }
+                        } else {
+                            <tr><td colspan="7" class="text-center text-muted py-4">لا توجد بيانات متاحة حالياً.</td></tr>
                         }
                     </tbody>
                 </table>
@@ -275,7 +277,7 @@
                         <tr><th>السنة</th><th>دار النشر</th><th>الدولة / المدينة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
-                        @if (publishersConf != null) {
+                        @if (publishersConf != null && publishersConf.Any()) {
                             @foreach (var item in publishersConf) {
                                 <tr>
                                     <td>@item.ConferenceYear</td>
@@ -294,92 +296,8 @@
                                     </td>
                                 </tr>
                             }
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 6. ورش عمل مؤتمر الناشرين -->
-        <div class="tab-pane fade @(activeTab == "PublishersWorkshops" ? "show active" : "")" id="pworkshop" role="tabpanel">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold text-info">👨‍🏫 ورش عمل مؤتمر الناشرين</h4>
-                <div>
-                    <a href="/Home/AddRecord?section=PublishersWorkshops" class="btn btn-info rounded-pill px-3 fw-bold text-dark">＋ إضافة</a>
-                    <a href="/Home/ExportExcel?section=PublishersWorkshops" class="btn btn-success rounded-pill px-3 fw-bold">📊 تصدير إكسل</a>
-                    <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');">
-                        <input type="hidden" name="section" value="PublishersWorkshops" />
-                        <button type="submit" class="btn btn-outline-danger rounded-pill px-3 fw-bold">🗑️ حذف الكل</button>
-                    </form>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-info">
-                        <tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الإجراءات</th></tr>
-                    </thead>
-                    <tbody>
-                        @if (publishersWorkshops != null) {
-                            @foreach (var item in publishersWorkshops) {
-                                <tr>
-                                    <td>@item.WorkshopYear</td>
-                                    <td class="fw-bold">@item.LecturerName</td>
-                                    <td>@item.Country</td>
-                                    <td>@item.WhatsAppNumber</td>
-                                    <td>@item.Email</td>
-                                    <td>
-                                        <a href="/Home/Edit?section=PublishersWorkshops&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️️</a>
-                                        <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
-                                            <input type="hidden" name="section" value="PublishersWorkshops" />
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">حذف 🗑️</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 7. ورش عمل مؤتمر الموزعين -->
-        <div class="tab-pane fade @(activeTab == "DistributorsWorkshops" ? "show active" : "")" id="dworkshop" role="tabpanel">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold" style="color: #20c997 !important;">🧑‍🏫 ورش عمل مؤتمر الموزعين</h4>
-                <div>
-                    <a href="/Home/AddRecord?section=DistributorsWorkshops" class="btn btn-success rounded-pill px-3 fw-bold" style="background-color: #20c997; border-color: #20c997;">＋ إضافة</a>
-                    <a href="/Home/ExportExcel?section=DistributorsWorkshops" class="btn btn-success rounded-pill px-3 fw-bold">📊 تصدير إكسل</a>
-                    <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');">
-                        <input type="hidden" name="section" value="DistributorsWorkshops" />
-                        <button type="submit" class="btn btn-outline-danger rounded-pill px-3 fw-bold">🗑️ حذف الكل</button>
-                    </form>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead style="background-color: #20c997; color: white;">
-                        <tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الإجراءات</th></tr>
-                    </thead>
-                    <tbody>
-                        @if (distributorsWorkshops != null) {
-                            @foreach (var item in distributorsWorkshops) {
-                                <tr>
-                                    <td>@item.WorkshopYear</td>
-                                    <td class="fw-bold">@item.LecturerName</td>
-                                    <td>@item.Country</td>
-                                    <td>@item.WhatsAppNumber</td>
-                                    <td>@item.Email</td>
-                                    <td>
-                                        <a href="/Home/Edit?section=DistributorsWorkshops&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
-                                        <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
-                                            <input type="hidden" name="section" value="DistributorsWorkshops" />
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">حذف 🗑️</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
+                        } else {
+                            <tr><td colspan="7" class="text-center text-muted py-4">لا توجد بيانات متاحة حالياً.</td></tr>
                         }
                     </tbody>
                 </table>
