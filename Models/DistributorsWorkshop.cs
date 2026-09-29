@@ -15,5 +15,6 @@ namespace SharjahEventsWeb.Models
         public string? WhatsAppNumber { get; set; }
         public string? Email { get; set; }
         public string? ResponsiblePerson { get; set; }
+        public int BookCount { get; set; } = 0;
     }
 }
