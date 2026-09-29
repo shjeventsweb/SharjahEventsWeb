@@ -1,9 +1,9 @@
 @{
     ViewData["Title"] = "إضافة سجل جديد";
-    string section = ViewBag.Section as string ?? "SharjahBookFairs";
-    bool isWorkshop = section == "PublishersWorkshops" || section == "DistributorsWorkshops";
-    bool isBookFair = section == "SharjahBookFairs";
-    bool isChildFestival = section == "SharjahChildFestivals";
+    string sec = ViewBag.Section as string ?? "SharjahBookFairs";
+    bool isWorkshop = sec == "PublishersWorkshops" || sec == "DistributorsWorkshops";
+    bool isBookFair = sec == "SharjahBookFairs";
+    bool isChildFestival = sec == "SharjahChildFestivals";
 }
 
 <div class="container py-5" dir="rtl">
@@ -13,7 +13,7 @@
                 <h3 class="fw-bold text-dark mb-4 text-center">إضافة سجل جديد</h3>
                 
                 <form asp-action="AddRecord" method="post">
-                    <input type="hidden" name="section" value="@section" />
+                    <input type="hidden" name="section" value="@sec" />
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">السنة</label>
@@ -87,7 +87,7 @@
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold">حفظ السجل</button>
-                        <a href="/Home/Index?activeTab=@section" class="btn btn-light btn-lg rounded-3">العودة للوحة التحكم</a>
+                        <a href="/Home/Index?activeTab=@sec" class="btn btn-light btn-lg rounded-3">العودة للوحة التحكم</a>
                     </div>
                 </form>
             </div>

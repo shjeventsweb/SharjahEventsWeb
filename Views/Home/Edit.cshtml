@@ -1,8 +1,8 @@
 @model dynamic
 @{
     ViewData["Title"] = "تعديل السجل";
-    string section = ViewBag.Section as string ?? "";
-    bool isWorkshop = section == "PublishersWorkshops" || section == "DistributorsWorkshops";
+    string sec = ViewBag.Section as string ?? "";
+    bool isWorkshop = sec == "PublishersWorkshops" || sec == "DistributorsWorkshops";
 }
 
 <div class="container py-5" dir="rtl">
@@ -12,7 +12,7 @@
                 <h3 class="fw-bold text-dark mb-4 text-center">تعديل بيانات السجل</h3>
                 
                 <form asp-action="Edit" method="post">
-                    <input type="hidden" name="section" value="@section" />
+                    <input type="hidden" name="section" value="@sec" />
                     <input type="hidden" name="id" value="@Model?.Id" />
 
                     <div class="mb-3">
@@ -65,7 +65,7 @@
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-warning btn-lg rounded-3 fw-bold text-dark">تحديث البيانات</button>
-                        <a href="/Home/Index?activeTab=@section" class="btn btn-light btn-lg rounded-3">إلغاء والعودة</a>
+                        <a href="/Home/Index?activeTab=@sec" class="btn btn-light btn-lg rounded-3">إلغاء والعودة</a>
                     </div>
                 </form>
             </div>
