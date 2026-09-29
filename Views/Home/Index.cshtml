@@ -1,14 +1,14 @@
 ﻿@{
     ViewData["Title"] = "لوحة التحكم - فعاليات الشارقة";
-    var bookFairs = ViewBag.BookFairs as List<SharjahEventsWeb.Models.SharjahBookFair>;
-    var childFestivals = ViewBag.ChildFestivals as List<SharjahEventsWeb.Models.SharjahChildFestival>;
-    var distributors = ViewBag.Distributors as List<SharjahEventsWeb.Models.DistributorsConference>;
-    var newYork = ViewBag.NewYork as List<SharjahEventsWeb.Models.NewYorkSession>;
-    var publishersConf = ViewBag.PublishersConf as List<SharjahEventsWeb.Models.PublishersConference>;
-    var publishersWorkshops = ViewBag.PublishersWorkshops as List<SharjahEventsWeb.Models.PublishersWorkshop>;
-    var distributorsWorkshops = ViewBag.DistributorsWorkshops as List<SharjahEventsWeb.Models.DistributorsWorkshop>;
+    var bookFairs = ViewBag.BookFairs as List<SharjahEventsWeb.Models.SharjahBookFair> ?? new List<SharjahEventsWeb.Models.SharjahBookFair>();
+    var childFestivals = ViewBag.ChildFestivals as List<SharjahEventsWeb.Models.SharjahChildFestival> ?? new List<SharjahEventsWeb.Models.SharjahChildFestival>();
+    var distributors = ViewBag.Distributors as List<SharjahEventsWeb.Models.DistributorsConference> ?? new List<SharjahEventsWeb.Models.DistributorsConference>();
+    var newYork = ViewBag.NewYork as List<SharjahEventsWeb.Models.NewYorkSession> ?? new List<SharjahEventsWeb.Models.NewYorkSession>();
+    var publishersConf = ViewBag.PublishersConf as List<SharjahEventsWeb.Models.PublishersConference> ?? new List<SharjahEventsWeb.Models.PublishersConference>();
+    var publishersWorkshops = ViewBag.PublishersWorkshops as List<SharjahEventsWeb.Models.PublishersWorkshop> ?? new List<SharjahEventsWeb.Models.PublishersWorkshop>();
+    var distributorsWorkshops = ViewBag.DistributorsWorkshops as List<SharjahEventsWeb.Models.DistributorsWorkshop> ?? new List<SharjahEventsWeb.Models.DistributorsWorkshop>();
 
-    string searchQuery = ViewBag.SearchQuery as string;
+    string searchQuery = ViewBag.SearchQuery as string ?? "";
     string activeTab = ViewBag.ActiveTab as string ?? "SharjahBookFairs";
 }
 
@@ -111,7 +111,7 @@
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
                                             <input type="hidden" name="section" value="SharjahBookFairs" />
                                             <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">حذف 🗑️</button>
+                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">حذف 🗑️️</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -201,7 +201,7 @@
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
                                             <input type="hidden" name="section" value="DistributorsConferences" />
                                             <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">حذف 🗑️</button>
+                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">حذف 🗑️️</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -316,7 +316,7 @@
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-info">
-                        <tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الإجراءات</th></tr>
+                        <tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الحالة</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
                         @if (publishersWorkshops != null) {
@@ -327,6 +327,15 @@
                                     <td>@item.Country</td>
                                     <td>@item.WhatsAppNumber</td>
                                     <td>@item.Email</td>
+                                    <td>
+                                        <form action="/Home/ToggleComplete" method="post" class="d-inline">
+                                            <input type="hidden" name="section" value="PublishersWorkshops" />
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-success" : "btn-outline-secondary") rounded-pill px-3 fw-bold">
+                                                @(item.IsCompleted ? "✓ مكتمل" : "⏳ قيد العمل")
+                                            </button>
+                                        </form>
+                                    </td>
                                     <td>
                                         <a href="/Home/Edit?section=PublishersWorkshops&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
@@ -352,14 +361,14 @@
                     <a href="/Home/ExportExcel?section=DistributorsWorkshops" class="btn btn-success rounded-pill px-3 fw-bold">📊 تصدير إكسل</a>
                     <form action="/Home/DeleteAll" method="post" class="d-inline" onsubmit="return confirm('⚠️ حذف الكل؟');">
                         <input type="hidden" name="section" value="DistributorsWorkshops" />
-                        <button type="submit" class="btn btn-outline-danger rounded-pill px-3 fw-bold">🗑️ حذف الكل</button>
+                        <button type="submit" class="btn btn-outline-danger rounded-pill px-3 fw-bold">🗑️️ حذف الكل</button>
                     </form>
                 </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead style="background-color: #20c997; color: white;">
-                        <tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الإجراءات</th></tr>
+                        <tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الحالة</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
                         @if (distributorsWorkshops != null) {
@@ -370,6 +379,15 @@
                                     <td>@item.Country</td>
                                     <td>@item.WhatsAppNumber</td>
                                     <td>@item.Email</td>
+                                    <td>
+                                        <form action="/Home/ToggleComplete" method="post" class="d-inline">
+                                            <input type="hidden" name="section" value="DistributorsWorkshops" />
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-success" : "btn-outline-secondary") rounded-pill px-3 fw-bold">
+                                                @(item.IsCompleted ? "✓ مكتمل" : "⏳ قيد العمل")
+                                            </button>
+                                        </form>
+                                    </td>
                                     <td>
                                         <a href="/Home/Edit?section=DistributorsWorkshops&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
