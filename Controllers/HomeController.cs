@@ -87,14 +87,24 @@ namespace SharjahEventsWeb.Controllers
             var newYork = new List<NewYorkSession>();
             var publishersConf = new List<PublishersConference>();
 
-            // جلب الأقسام الأساسية المضمونة بأمان تامة
-            try { bookFairs = _context.SharjahBookFairs.ToList(); } catch { }
+            try 
+            { 
+                bookFairs = _context.SharjahBookFairs.ToList(); 
+                // إذا كانت القائمة فارغة، نضع سجلاً تجريبياً لكي نتاكد أن العرض يعمل
+                if (!bookFairs.Any())
+                {
+                    _context.SharjahBookFairs.Add(new SharjahBookFair { ExhibitionYear = 2026, PublishingHouseName = "دار الشارقة التجريبية", Country = "الإمارات", City = "الشارقة", WhatsAppNumber = "971500000000", Email = "test@sharjah.ae", ResponsiblePerson = "أحمد", BookCount = 10, Specialization = "عام", RequiredSpace = "12م²" });
+                    _context.SaveChanges();
+                    bookFairs = _context.SharjahBookFairs.ToList();
+                }
+            } 
+            catch { }
+
             try { childFestivals = _context.SharjahChildFestivals.ToList(); } catch { }
             try { distributors = _context.DistributorsConferences.ToList(); } catch { }
             try { newYork = _context.NewYorkSessions.ToList(); } catch { }
             try { publishersConf = _context.PublishersConferences.ToList(); } catch { }
 
-            // قوائم فارغة للورش لتجنب أي انهيار في حال عدم مطابقة أعمدة قاعدة البيانات
             var publishersWorkshops = new List<PublishersWorkshop>();
             var distributorsWorkshops = new List<DistributorsWorkshop>();
 
