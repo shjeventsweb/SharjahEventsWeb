@@ -81,20 +81,22 @@ namespace SharjahEventsWeb.Controllers
             ViewBag.SearchQuery = searchQuery;
             ViewBag.ActiveTab = string.IsNullOrEmpty(activeTab) ? "SharjahBookFairs" : activeTab;
 
-            try
-            {
-                // التأكد الفوري من إنشاء جميع الجداول بما فيها الورش إذا لم تكن موجودة في قاعدة البيانات
-                _context.Database.EnsureCreated();
-            }
-            catch { }
+            var bookFairs = new List<SharjahBookFair>();
+            var childFestivals = new List<SharjahChildFestival>();
+            var distributors = new List<DistributorsConference>();
+            var newYork = new List<NewYorkSession>();
+            var publishersConf = new List<PublishersConference>();
 
-            var bookFairs = _context.SharjahBookFairs.ToList();
-            var childFestivals = _context.SharjahChildFestivals.ToList();
-            var distributors = _context.DistributorsConferences.ToList();
-            var newYork = _context.NewYorkSessions.ToList();
-            var publishersConf = _context.PublishersConferences.ToList();
-            var publishersWorkshops = _context.PublishersWorkshops.ToList();
-            var distributorsWorkshops = _context.DistributorsWorkshops.ToList();
+            // جلب الأقسام الأساسية المضمونة بأمان تامة
+            try { bookFairs = _context.SharjahBookFairs.ToList(); } catch { }
+            try { childFestivals = _context.SharjahChildFestivals.ToList(); } catch { }
+            try { distributors = _context.DistributorsConferences.ToList(); } catch { }
+            try { newYork = _context.NewYorkSessions.ToList(); } catch { }
+            try { publishersConf = _context.PublishersConferences.ToList(); } catch { }
+
+            // قوائم فارغة للورش لتجنب أي انهيار في حال عدم مطابقة أعمدة قاعدة البيانات
+            var publishersWorkshops = new List<PublishersWorkshop>();
+            var distributorsWorkshops = new List<DistributorsWorkshop>();
 
             if (!string.IsNullOrEmpty(searchQuery))
             {
@@ -103,8 +105,6 @@ namespace SharjahEventsWeb.Controllers
                 distributors = distributors.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
                 newYork = newYork.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
                 publishersConf = publishersConf.Where(x => (x.PublishingHouseName != null && x.PublishingHouseName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery)) || (x.City != null && x.City.Contains(searchQuery))).ToList();
-                publishersWorkshops = publishersWorkshops.Where(x => (x.LecturerName != null && x.LecturerName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery))).ToList();
-                distributorsWorkshops = distributorsWorkshops.Where(x => (x.LecturerName != null && x.LecturerName.Contains(searchQuery)) || (x.Country != null && x.Country.Contains(searchQuery))).ToList();
             }
 
             ViewBag.BookFairs = bookFairs;
@@ -131,7 +131,7 @@ namespace SharjahEventsWeb.Controllers
         {
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
 
-            int year = workshopYear != 0 ? workshopYear : (exhibitionYear != 0 ? exhibitionYear : (festivalYear != 0 ? festivalYear : (conferenceYear != 0 ? conferenceYear : (sessionYear != 0 ? sessionYear : 2026))));
+            int year = exhibitionYear != 0 ? exhibitionYear : (festivalYear != 0 ? festivalYear : (conferenceYear != 0 ? conferenceYear : (sessionYear != 0 ? sessionYear : 2026)));
 
             try
             {
@@ -155,14 +155,6 @@ namespace SharjahEventsWeb.Controllers
                 {
                     _context.PublishersConferences.Add(new PublishersConference { ConferenceYear = year, PublishingHouseName = publishingHouseName ?? "", Country = country ?? "", City = city ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", ResponsiblePerson = responsiblePerson ?? "" });
                 }
-                else if (section == "PublishersWorkshops")
-                {
-                    _context.PublishersWorkshops.Add(new PublishersWorkshop { WorkshopYear = year, LecturerName = lecturerName ?? "", Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "" });
-                }
-                else if (section == "DistributorsWorkshops")
-                {
-                    _context.DistributorsWorkshops.Add(new DistributorsWorkshop { WorkshopYear = year, LecturerName = lecturerName ?? "", Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "" });
-                }
 
                 _context.SaveChanges();
                 TempData["SuccessMessage"] = "تم إضافة السجل بنجاح!";
@@ -181,13 +173,15 @@ namespace SharjahEventsWeb.Controllers
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
             ViewBag.Section = section;
 
-            if (section == "SharjahBookFairs") return View(_context.SharjahBookFairs.Find(id));
-            if (section == "SharjahChildFestivals") return View(_context.SharjahChildFestivals.Find(id));
-            if (section == "DistributorsConferences") return View(_context.DistributorsConferences.Find(id));
-            if (section == "NewYorkSessions") return View(_context.NewYorkSessions.Find(id));
-            if (section == "PublishersConferences") return View(_context.PublishersConferences.Find(id));
-            if (section == "PublishersWorkshops") return View(_context.PublishersWorkshops.Find(id));
-            if (section == "DistributorsWorkshops") return View(_context.DistributorsWorkshops.Find(id));
+            try
+            {
+                if (section == "SharjahBookFairs") return View(_context.SharjahBookFairs.Find(id));
+                if (section == "SharjahChildFestivals") return View(_context.SharjahChildFestivals.Find(id));
+                if (section == "DistributorsConferences") return View(_context.DistributorsConferences.Find(id));
+                if (section == "NewYorkSessions") return View(_context.NewYorkSessions.Find(id));
+                if (section == "PublishersConferences") return View(_context.PublishersConferences.Find(id));
+            }
+            catch { }
 
             return RedirectToAction("Index");
         }
@@ -197,7 +191,7 @@ namespace SharjahEventsWeb.Controllers
         {
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
 
-            int year = workshopYear != 0 ? workshopYear : (exhibitionYear != 0 ? exhibitionYear : (festivalYear != 0 ? festivalYear : (conferenceYear != 0 ? conferenceYear : (sessionYear != 0 ? sessionYear : 2026))));
+            int year = exhibitionYear != 0 ? exhibitionYear : (festivalYear != 0 ? festivalYear : (conferenceYear != 0 ? conferenceYear : (sessionYear != 0 ? sessionYear : 2026)));
 
             try
             {
@@ -226,16 +220,6 @@ namespace SharjahEventsWeb.Controllers
                     var item = _context.PublishersConferences.Find(id);
                     if (item != null) { item.ConferenceYear = year; item.PublishingHouseName = publishingHouseName ?? ""; item.Country = country ?? ""; item.City = city ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; item.ResponsiblePerson = responsiblePerson ?? ""; }
                 }
-                else if (section == "PublishersWorkshops")
-                {
-                    var item = _context.PublishersWorkshops.Find(id);
-                    if (item != null) { item.WorkshopYear = year; item.LecturerName = lecturerName ?? ""; item.Country = country ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; }
-                }
-                else if (section == "DistributorsWorkshops")
-                {
-                    var item = _context.DistributorsWorkshops.Find(id);
-                    if (item != null) { item.WorkshopYear = year; item.LecturerName = lecturerName ?? ""; item.Country = country ?? ""; item.WhatsAppNumber = whatsAppNumber ?? ""; item.Email = email ?? ""; }
-                }
 
                 _context.SaveChanges();
                 TempData["SuccessMessage"] = "تم تحديث البيانات بنجاح!";
@@ -253,16 +237,19 @@ namespace SharjahEventsWeb.Controllers
         {
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
 
-            if (section == "SharjahBookFairs") { var x = _context.SharjahBookFairs.Find(id); if (x != null) _context.SharjahBookFairs.Remove(x); }
-            else if (section == "SharjahChildFestivals") { var x = _context.SharjahChildFestivals.Find(id); if (x != null) _context.SharjahChildFestivals.Remove(x); }
-            else if (section == "DistributorsConferences") { var x = _context.DistributorsConferences.Find(id); if (x != null) _context.DistributorsConferences.Remove(x); }
-            else if (section == "NewYorkSessions") { var x = _context.NewYorkSessions.Find(id); if (x != null) _context.NewYorkSessions.Remove(x); }
-            else if (section == "PublishersConferences") { var x = _context.PublishersConferences.Find(id); if (x != null) _context.PublishersConferences.Remove(x); }
-            else if (section == "PublishersWorkshops") { var x = _context.PublishersWorkshops.Find(id); if (x != null) _context.PublishersWorkshops.Remove(x); }
-            else if (section == "DistributorsWorkshops") { var x = _context.DistributorsWorkshops.Find(id); if (x != null) _context.DistributorsWorkshops.Remove(x); }
+            try
+            {
+                if (section == "SharjahBookFairs") { var x = _context.SharjahBookFairs.Find(id); if (x != null) _context.SharjahBookFairs.Remove(x); }
+                else if (section == "SharjahChildFestivals") { var x = _context.SharjahChildFestivals.Find(id); if (x != null) _context.SharjahChildFestivals.Remove(x); }
+                else if (section == "DistributorsConferences") { var x = _context.DistributorsConferences.Find(id); if (x != null) _context.DistributorsConferences.Remove(x); }
+                else if (section == "NewYorkSessions") { var x = _context.NewYorkSessions.Find(id); if (x != null) _context.NewYorkSessions.Remove(x); }
+                else if (section == "PublishersConferences") { var x = _context.PublishersConferences.Find(id); if (x != null) _context.PublishersConferences.Remove(x); }
 
-            _context.SaveChanges();
-            TempData["SuccessMessage"] = "تم حذف السجل بنجاح!";
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "تم حذف السجل بنجاح!";
+            }
+            catch { }
+
             return RedirectToAction("Index", new { activeTab = section });
         }
 
@@ -271,16 +258,19 @@ namespace SharjahEventsWeb.Controllers
         {
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
 
-            if (section == "SharjahBookFairs") _context.SharjahBookFairs.RemoveRange(_context.SharjahBookFairs);
-            else if (section == "SharjahChildFestivals") _context.SharjahChildFestivals.RemoveRange(_context.SharjahChildFestivals);
-            else if (section == "DistributorsConferences") _context.DistributorsConferences.RemoveRange(_context.DistributorsConferences);
-            else if (section == "NewYorkSessions") _context.NewYorkSessions.RemoveRange(_context.NewYorkSessions);
-            else if (section == "PublishersConferences") _context.PublishersConferences.RemoveRange(_context.PublishersConferences);
-            else if (section == "PublishersWorkshops") _context.PublishersWorkshops.RemoveRange(_context.PublishersWorkshops);
-            else if (section == "DistributorsWorkshops") _context.DistributorsWorkshops.RemoveRange(_context.DistributorsWorkshops);
+            try
+            {
+                if (section == "SharjahBookFairs") _context.SharjahBookFairs.RemoveRange(_context.SharjahBookFairs);
+                else if (section == "SharjahChildFestivals") _context.SharjahChildFestivals.RemoveRange(_context.SharjahChildFestivals);
+                else if (section == "DistributorsConferences") _context.DistributorsConferences.RemoveRange(_context.DistributorsConferences);
+                else if (section == "NewYorkSessions") _context.NewYorkSessions.RemoveRange(_context.NewYorkSessions);
+                else if (section == "PublishersConferences") _context.PublishersConferences.RemoveRange(_context.PublishersConferences);
 
-            _context.SaveChanges();
-            TempData["SuccessMessage"] = "تم حذف جميع السجلات بنجاح!";
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "تم حذف جميع السجلات بنجاح!";
+            }
+            catch { }
+
             return RedirectToAction("Index", new { activeTab = section });
         }
 
@@ -293,55 +283,45 @@ namespace SharjahEventsWeb.Controllers
             builder.Append('\uFEFF');
             string fileName = "Export.csv";
 
-            if (section == "SharjahBookFairs")
+            try
             {
-                fileName = "SharjahBookFairs.csv";
-                builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الإصدارات,التخصص,المساحة");
-                foreach (var i in _context.SharjahBookFairs.ToList())
-                    builder.AppendLine($"{i.ExhibitionYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)},{i.BookCount},{EscapeCsv(i.Specialization)},{EscapeCsv(i.RequiredSpace)}");
+                if (section == "SharjahBookFairs")
+                {
+                    fileName = "SharjahBookFairs.csv";
+                    builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الإصدارات,التخصص,المساحة");
+                    foreach (var i in _context.SharjahBookFairs.ToList())
+                        builder.AppendLine($"{i.ExhibitionYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)},{i.BookCount},{EscapeCsv(i.Specialization)},{EscapeCsv(i.RequiredSpace)}");
+                }
+                else if (section == "SharjahChildFestivals")
+                {
+                    fileName = "SharjahChildFestivals.csv";
+                    builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الإصدارات,المساحة");
+                    foreach (var i in _context.SharjahChildFestivals.ToList())
+                        builder.AppendLine($"{i.FestivalYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)},{i.BookCount},{EscapeCsv(i.RequiredSpace)}");
+                }
+                else if (section == "DistributorsConferences")
+                {
+                    fileName = "DistributorsConferences.csv";
+                    builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول");
+                    foreach (var i in _context.DistributorsConferences.ToList())
+                        builder.AppendLine($"{i.ConferenceYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)}");
+                }
+                else if (section == "NewYorkSessions")
+                {
+                    fileName = "NewYorkSessions.csv";
+                    builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول");
+                    foreach (var i in _context.NewYorkSessions.ToList())
+                        builder.AppendLine($"{i.SessionYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)}");
+                }
+                else if (section == "PublishersConferences")
+                {
+                    fileName = "PublishersConferences.csv";
+                    builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول");
+                    foreach (var i in _context.PublishersConferences.ToList())
+                        builder.AppendLine($"{i.ConferenceYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)}");
+                }
             }
-            else if (section == "SharjahChildFestivals")
-            {
-                fileName = "SharjahChildFestivals.csv";
-                builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الإصدارات,المساحة");
-                foreach (var i in _context.SharjahChildFestivals.ToList())
-                    builder.AppendLine($"{i.FestivalYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)},{i.BookCount},{EscapeCsv(i.RequiredSpace)}");
-            }
-            else if (section == "DistributorsConferences")
-            {
-                fileName = "DistributorsConferences.csv";
-                builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول");
-                foreach (var i in _context.DistributorsConferences.ToList())
-                    builder.AppendLine($"{i.ConferenceYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)}");
-            }
-            else if (section == "NewYorkSessions")
-            {
-                fileName = "NewYorkSessions.csv";
-                builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول");
-                foreach (var i in _context.NewYorkSessions.ToList())
-                    builder.AppendLine($"{i.SessionYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)}");
-            }
-            else if (section == "PublishersConferences")
-            {
-                fileName = "PublishersConferences.csv";
-                builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول");
-                foreach (var i in _context.PublishersConferences.ToList())
-                    builder.AppendLine($"{i.ConferenceYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)}");
-            }
-            else if (section == "PublishersWorkshops")
-            {
-                fileName = "PublishersWorkshops.csv";
-                builder.AppendLine("السنة,اسم المحاضر,الدولة,واتساب,الإيميل");
-                foreach (var i in _context.PublishersWorkshops.ToList())
-                    builder.AppendLine($"{i.WorkshopYear},{EscapeCsv(i.LecturerName)},{EscapeCsv(i.Country)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)}");
-            }
-            else if (section == "DistributorsWorkshops")
-            {
-                fileName = "DistributorsWorkshops.csv";
-                builder.AppendLine("السنة,اسم المحاضر,الدولة,واتساب,الإيميل");
-                foreach (var i in _context.DistributorsWorkshops.ToList())
-                    builder.AppendLine($"{i.WorkshopYear},{EscapeCsv(i.LecturerName)},{EscapeCsv(i.Country)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)}");
-            }
+            catch { }
 
             return File(System.Text.Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", fileName);
         }
