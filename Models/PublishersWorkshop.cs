@@ -13,5 +13,6 @@ namespace SharjahEventsWeb.Models
         public string? Country { get; set; }
         public string? WhatsAppNumber { get; set; }
         public string? Email { get; set; }
+        public bool IsCompleted { get; set; } = false;
     }
 }
