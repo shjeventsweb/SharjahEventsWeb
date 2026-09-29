@@ -54,7 +54,7 @@
         <form method="get" action="/Home/Index" class="row g-3 align-items-center">
             <input type="hidden" name="activeTab" value="@activeTab" />
             <div class="col-md-10">
-                <input type="text" name="searchQuery" value="@searchQuery" class="form-control form-control-lg rounded-3" placeholder="ابحث باسم دار النشر، الدولة، المدينة، أو المحاضر..." />
+                <input type="text" name="searchQuery" value="@searchQuery" class="form-control form-control-lg rounded-3" placeholder="ابحث باسم دار النشر، الدولة، المدينة..." />
             </div>
             <div class="col-md-2 d-grid">
                 <button type="submit" class="btn btn-dark btn-lg rounded-3 fw-bold">بحث 🔍</button>
@@ -105,7 +105,7 @@
                                     <td>@item.ResponsiblePerson</td>
                                     <td>@item.BookCount</td>
                                     <td>@item.Specialization</td>
-                                    <td>@item.RequiredSpace م²</td>
+                                    <td>@item.RequiredSpace</td>
                                     <td>
                                         <a href="/Home/Edit?section=SharjahBookFairs&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
@@ -151,7 +151,7 @@
                                     <td>@item.Email</td>
                                     <td>@item.ResponsiblePerson</td>
                                     <td>@item.BookCount</td>
-                                    <td>@item.RequiredSpace م²</td>
+                                    <td>@item.RequiredSpace</td>
                                     <td>
                                         <a href="/Home/Edit?section=SharjahChildFestivals&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
@@ -197,7 +197,7 @@
                                     <td>@item.Email</td>
                                     <td>@item.ResponsiblePerson</td>
                                     <td>
-                                        <a href="/Home/Edit?section=DistributorsConferences&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
+                                        <a href="/Home/Edit?section=DistributorsConferences&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
                                             <input type="hidden" name="section" value="DistributorsConferences" />
                                             <input type="hidden" name="id" value="@item.Id" />
@@ -316,17 +316,18 @@
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-info">
-                        <tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الإجراءات</th></tr>
+                        <tr><th>السنة</th><th>اسم الجهة</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
                         @if (publishersWorkshops != null) {
                             @foreach (var item in publishersWorkshops) {
                                 <tr>
                                     <td>@item.WorkshopYear</td>
-                                    <td class="fw-bold">@item.LecturerName</td>
+                                    <td class="fw-bold">@item.PublishingHouseName</td>
                                     <td>@item.Country</td>
                                     <td>@item.WhatsAppNumber</td>
                                     <td>@item.Email</td>
+                                    <td>@item.ResponsiblePerson</td>
                                     <td>
                                         <a href="/Home/Edit?section=PublishersWorkshops&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
@@ -359,17 +360,18 @@
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead style="background-color: #20c997; color: white;">
-                        <tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الإجراءات</th></tr>
+                        <tr><th>السنة</th><th>اسم الجهة</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>المسؤول</th><th>الإجراءات</th></tr>
                     </thead>
                     <tbody>
                         @if (distributorsWorkshops != null) {
                             @foreach (var item in distributorsWorkshops) {
                                 <tr>
                                     <td>@item.WorkshopYear</td>
-                                    <td class="fw-bold">@item.LecturerName</td>
+                                    <td class="fw-bold">@item.PublishingHouseName</td>
                                     <td>@item.Country</td>
                                     <td>@item.WhatsAppNumber</td>
                                     <td>@item.Email</td>
+                                    <td>@item.ResponsiblePerson</td>
                                     <td>
                                         <a href="/Home/Edit?section=DistributorsWorkshops&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
