@@ -8,20 +8,12 @@ namespace SharjahEventsWeb.Models
     {
         [Key]
         public int Id { get; set; }
-
-        [Column("WorkshopYear")]
         public int WorkshopYear { get; set; }
-
-        [Column("LecturerName")]
-        public string? LecturerName { get; set; }
-
-        [Column("Country")]
+        public string? PublishingHouseName { get; set; }
         public string? Country { get; set; }
-
-        [Column("WhatsAppNumber")]
+        public string? City { get; set; }
         public string? WhatsAppNumber { get; set; }
-
-        [Column("Email")]
         public string? Email { get; set; }
+        public string? ResponsiblePerson { get; set; }
     }
 }
