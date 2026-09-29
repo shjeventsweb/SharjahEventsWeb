@@ -14,5 +14,14 @@ namespace SharjahEventsWeb.Models
         public DbSet<PublishersConference> PublishersConferences { get; set; }
         public DbSet<PublishersWorkshop> PublishersWorkshops { get; set; }
         public DbSet<DistributorsWorkshop> DistributorsWorkshops { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // إجبار الكود على استخدام أسماء الأعمدة وصيغتها في PostgreSQL بدقة لمنع خطأ عدم تطابق الأعمدة
+            modelBuilder.Entity<PublishersWorkshop>().ToTable("PublishersWorkshops");
+            modelBuilder.Entity<DistributorsWorkshop>().ToTable("DistributorsWorkshops");
+        }
     }
 }

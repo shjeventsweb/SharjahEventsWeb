@@ -1,15 +1,27 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SharjahEventsWeb.Models
 {
+    [Table("DistributorsWorkshops")]
     public class DistributorsWorkshop
     {
         [Key]
         public int Id { get; set; }
+
+        [Column("WorkshopYear")]
         public int WorkshopYear { get; set; }
-        public string LecturerName { get; set; } = string.Empty;
-        public string Country { get; set; } = string.Empty;
-        public string WhatsAppNumber { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+
+        [Column("LecturerName")]
+        public string? LecturerName { get; set; }
+
+        [Column("Country")]
+        public string? Country { get; set; }
+
+        [Column("WhatsAppNumber")]
+        public string? WhatsAppNumber { get; set; }
+
+        [Column("Email")]
+        public string? Email { get; set; }
     }
 }
