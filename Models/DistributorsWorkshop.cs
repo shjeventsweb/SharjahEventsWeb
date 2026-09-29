@@ -13,11 +13,12 @@ namespace SharjahEventsWeb.Models
         [Column("LecturerName")]
         public string? LecturerName { get; set; }
 
+        [Column("PublishingHouseName")]
+        public string? PublishingHouseName { get; set; }
+
         public string? Country { get; set; }
         public string? WhatsAppNumber { get; set; }
         public string? Email { get; set; }
-
-        // حقول افتراضية لتفادي أخطاء قيود قاعدة البيانات
         public string? City { get; set; } = "الشارقة";
         public string? ResponsiblePerson { get; set; } = "-";
         public int BookCount { get; set; } = 0;
