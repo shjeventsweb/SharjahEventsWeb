@@ -176,42 +176,23 @@ namespace SharjahEventsWeb.Controllers
             return RedirectToAction("Index", new { activeTab = section });
         }
 
-        [HttpPost]
+       [HttpPost]
         public IActionResult ToggleComplete(string section, int id)
         {
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
 
-            try
-            {
-                if (section == "PublishersWorkshops") { var x = _context.PublishersWorkshops.Find(id); if (x != null) { x.IsCompleted = !x.IsCompleted; _context.SaveChanges(); } }
-                else if (section == "DistributorsWorkshops") { var x = _context.DistributorsWorkshops.Find(id); if (x != null) { x.IsCompleted = !x.IsCompleted; _context.SaveChanges(); } }
+            if (section == "SharjahBookFairs") { var x = _context.SharjahBookFairs.Find(id); if (x != null) x.IsCompleted = !x.IsCompleted; }
+            else if (section == "SharjahChildFestivals") { var x = _context.SharjahChildFestivals.Find(id); if (x != null) x.IsCompleted = !x.IsCompleted; }
+            else if (section == "DistributorsConferences") { var x = _context.DistributorsConferences.Find(id); if (x != null) x.IsCompleted = !x.IsCompleted; }
+            else if (section == "NewYorkSessions") { var x = _context.NewYorkSessions.Find(id); if (x != null) x.IsCompleted = !x.IsCompleted; }
+            else if (section == "PublishersConferences") { var x = _context.PublishersConferences.Find(id); if (x != null) x.IsCompleted = !x.IsCompleted; }
+            else if (section == "PublishersWorkshops") { var x = _context.PublishersWorkshops.Find(id); if (x != null) x.IsCompleted = !x.IsCompleted; }
+            else if (section == "DistributorsWorkshops") { var x = _context.DistributorsWorkshops.Find(id); if (x != null) x.IsCompleted = !x.IsCompleted; }
 
-                TempData["SuccessMessage"] = "تم تحديث حالة الإنجاز بنجاح!";
-            }
-            catch { }
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "تم تحديث حالة الإنجاز بنجاح!";
 
             return RedirectToAction("Index", new { activeTab = section });
-        }
-
-        [HttpGet]
-        public IActionResult Edit(string section, int id)
-        {
-            if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
-            ViewBag.Section = section;
-
-            try
-            {
-                if (section == "SharjahBookFairs") return View(_context.SharjahBookFairs.Find(id));
-                if (section == "SharjahChildFestivals") return View(_context.SharjahChildFestivals.Find(id));
-                if (section == "DistributorsConferences") return View(_context.DistributorsConferences.Find(id));
-                if (section == "NewYorkSessions") return View(_context.NewYorkSessions.Find(id));
-                if (section == "PublishersConferences") return View(_context.PublishersConferences.Find(id));
-                if (section == "PublishersWorkshops") return View(_context.PublishersWorkshops.Find(id));
-                if (section == "DistributorsWorkshops") return View(_context.DistributorsWorkshops.Find(id));
-            }
-            catch { }
-
-            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -346,7 +327,6 @@ namespace SharjahEventsWeb.Controllers
 
             return File(System.Text.Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", fileName);
         }
-
         private string EscapeCsv(string? input)
         {
             if (string.IsNullOrEmpty(input)) return "";
