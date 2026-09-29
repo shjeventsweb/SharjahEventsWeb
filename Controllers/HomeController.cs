@@ -159,11 +159,11 @@ namespace SharjahEventsWeb.Controllers
                 }
                 else if (section == "PublishersWorkshops")
                 {
-                    _context.PublishersWorkshops.Add(new PublishersWorkshop { WorkshopYear = year, LecturerName = lecturerName ?? "", PublishingHouseName = targetPubName, Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", City = "الشارقة", ResponsiblePerson = "-", BookCount = 0, Specialization = "عام" });
+                    _context.PublishersWorkshops.Add(new PublishersWorkshop { WorkshopYear = year, LecturerName = lecturerName ?? "", PublishingHouseName = targetPubName, Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", City = "الشارقة", ResponsiblePerson = "-", BookCount = 0, Specialization = "عام", RequiredSpace = "-" });
                 }
                 else if (section == "DistributorsWorkshops")
                 {
-                    _context.DistributorsWorkshops.Add(new DistributorsWorkshop { WorkshopYear = year, LecturerName = lecturerName ?? "", PublishingHouseName = targetPubName, Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", City = "الشارقة", ResponsiblePerson = "-", BookCount = 0, Specialization = "عام" });
+                    _context.DistributorsWorkshops.Add(new DistributorsWorkshop { WorkshopYear = year, LecturerName = lecturerName ?? "", PublishingHouseName = targetPubName, Country = country ?? "", WhatsAppNumber = whatsAppNumber ?? "", Email = email ?? "", City = "الشارقة", ResponsiblePerson = "-", BookCount = 0, Specialization = "عام", RequiredSpace = "-" });
                 }
 
                 _context.SaveChanges();
