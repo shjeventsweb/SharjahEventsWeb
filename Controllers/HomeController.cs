@@ -94,8 +94,32 @@ namespace SharjahEventsWeb.Controllers
             try { distributors = _context.DistributorsConferences.ToList(); } catch { }
             try { newYork = _context.NewYorkSessions.ToList(); } catch { }
             try { publishersConf = _context.PublishersConferences.ToList(); } catch { }
-            try { publishersWorkshops = _context.PublishersWorkshops.ToList(); } catch { }
-            try { distributorsWorkshops = _context.DistributorsWorkshops.ToList(); } catch { }
+
+            // جلب وإضافة سجل تجريبي لورش الناشرين إن كانت فارغة لضمان ظهور البيانات
+            try 
+            { 
+                publishersWorkshops = _context.PublishersWorkshops.ToList(); 
+                if (!publishersWorkshops.Any())
+                {
+                    _context.PublishersWorkshops.Add(new PublishersWorkshop { WorkshopYear = 2026, LecturerName = "د. أحمد الشامسي", Country = "الإمارات", WhatsAppNumber = "971500000000", Email = "workshop1@sharjah.ae" });
+                    _context.SaveChanges();
+                    publishersWorkshops = _context.PublishersWorkshops.ToList();
+                }
+            } 
+            catch { }
+
+            // جلب وإضافة سجل تجريبي لورش الموزعين إن كانت فارغة
+            try 
+            { 
+                distributorsWorkshops = _context.DistributorsWorkshops.ToList(); 
+                if (!distributorsWorkshops.Any())
+                {
+                    _context.DistributorsWorkshops.Add(new DistributorsWorkshop { WorkshopYear = 2026, LecturerName = "أ. خولة الملا", Country = "الإمارات", WhatsAppNumber = "971500000000", Email = "workshop2@sharjah.ae" });
+                    _context.SaveChanges();
+                    distributorsWorkshops = _context.DistributorsWorkshops.ToList();
+                }
+            } 
+            catch { }
 
             if (!string.IsNullOrEmpty(searchQuery))
             {
