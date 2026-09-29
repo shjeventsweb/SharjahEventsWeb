@@ -1,10 +1,9 @@
 @{
     ViewData["Title"] = "إضافة سجل جديد";
-    string secName = ViewBag.Section as string ?? "SharjahBookFairs";
-    bool isWorkshop = secName == "PublishersWorkshops" || secName == "DistributorsWorkshops";
-    bool isBookFair = secName == "SharjahBookFairs";
-    bool isChildFestival = secName == "SharjahChildFestivals";
-    bool requiresBookAndSpace = isBookFair || isChildFestival;
+    string section = ViewBag.Section as string ?? "SharjahBookFairs";
+    bool isWorkshop = section == "PublishersWorkshops" || section == "DistributorsWorkshops";
+    bool isBookFair = section == "SharjahBookFairs";
+    bool isChildFestival = section == "SharjahChildFestivals";
 }
 
 <div class="container py-5" dir="rtl">
@@ -14,7 +13,7 @@
                 <h3 class="fw-bold text-dark mb-4 text-center">إضافة سجل جديد</h3>
                 
                 <form asp-action="AddRecord" method="post">
-                    <input type="hidden" name="section" value="@secName" />
+                    <input type="hidden" name="section" value="@section" />
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">السنة</label>
@@ -49,24 +48,23 @@
                             </div>
                         </div>
 
-                        @if (requiresBookAndSpace)
+                        @if (isBookFair || isChildFestival)
                         {
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">عدد الكتب</label>
+                                    <label class="form-label fw-bold">عدد الإصدارات</label>
                                     <input type="number" name="bookCount" class="form-control form-control-lg" value="0" required />
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">المساحة المطلوبة</label>
-                                    <input type="text" name="requiredSpace" class="form-control form-control-lg" placeholder="مثال: 6م أو 12م" required />
+                                    <input type="text" name="requiredSpace" class="form-control form-control-lg" placeholder="مثال: 12م²" required />
                                 </div>
                             </div>
-
                             @if (isBookFair)
                             {
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">التخصص</label>
-                                    <input type="text" name="specialization" class="form-control form-control-lg" placeholder="تخصص دار النشر" required />
+                                    <input type="text" name="specialization" class="form-control form-control-lg" required />
                                 </div>
                             }
                         }
@@ -89,7 +87,7 @@
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold">حفظ السجل</button>
-                        <a href="/Home/Index?activeTab=@secName" class="btn btn-light btn-lg rounded-3">العودة للوحة التحكم</a>
+                        <a href="/Home/Index?activeTab=@section" class="btn btn-light btn-lg rounded-3">العودة للوحة التحكم</a>
                     </div>
                 </form>
             </div>
