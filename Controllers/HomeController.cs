@@ -81,7 +81,13 @@ namespace SharjahEventsWeb.Controllers
             ViewBag.SearchQuery = searchQuery;
             ViewBag.ActiveTab = string.IsNullOrEmpty(activeTab) ? "SharjahBookFairs" : activeTab;
 
-            // تهيئة القوائم بقيم فارغة لتجنب أي انهيار
+            try
+            {
+                // التأكد من إنشاء الجداول تلقائياً في قاعدة البيانات إذا كانت ناقصة
+                _context.Database.EnsureCreated();
+            }
+            catch { }
+
             var bookFairs = new List<SharjahBookFair>();
             var childFestivals = new List<SharjahChildFestival>();
             var distributors = new List<DistributorsConference>();
