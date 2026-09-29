@@ -70,7 +70,7 @@
         <li class="nav-item"><button class="nav-link tab-newyork @(activeTab == "NewYorkSessions" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#newyork" type="button">🗽 دورة نيويورك</button></li>
         <li class="nav-item"><button class="nav-link tab-publishers @(activeTab == "PublishersConferences" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#publishers" type="button">🏢 مؤتمر الناشرين</button></li>
         <li class="nav-item"><button class="nav-link tab-pworkshop @(activeTab == "PublishersWorkshops" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#pworkshop" type="button">👨‍🏫 ورش الناشرين</button></li>
-        <li class="nav-item"><button class="nav-link tab-dworkshop @(activeTab == "DistributorsWorkshops" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#dworkshop" type="button">🧑‍🏫 ورش الموزعين</button></li>
+        <li class="nav-item"><button class="nav-link tab-dworkshop @(activeTab == "DistributorsWorkshops" ? "active" : "") shadow-sm px-4 py-2" data-bs-toggle="pill" data-bs-target="#dworkshop" type="button">🧑‍‍🏫 ورش الموزعين</button></li>
     </ul>
 
     <div class="tab-content bg-white p-4 rounded-4 shadow-sm">
@@ -328,7 +328,7 @@
                                     <td>@item.WhatsAppNumber</td>
                                     <td>@item.Email</td>
                                     <td>
-                                        <a href="/Home/Edit?section=PublishersWorkshops&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️</a>
+                                        <a href="/Home/Edit?section=PublishersWorkshops&id=@item.Id" class="btn btn-sm btn-warning rounded-pill px-3 mb-1">تعديل ✏️️</a>
                                         <form action="/Home/Delete" method="post" class="d-inline" onsubmit="return confirm('حذف هذا السجل؟');">
                                             <input type="hidden" name="section" value="PublishersWorkshops" />
                                             <input type="hidden" name="id" value="@item.Id" />
@@ -346,7 +346,7 @@
         <!-- 7. ورش عمل مؤتمر الموزعين -->
         <div class="tab-pane fade @(activeTab == "DistributorsWorkshops" ? "show active" : "")" id="dworkshop" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold text-success" style="color: #20c997 !important;">🧑‍🏫 ورش عمل مؤتمر الموزعين</h4>
+                <h4 class="fw-bold" style="color: #20c997 !important;">🧑‍🏫 ورش عمل مؤتمر الموزعين</h4>
                 <div>
                     <a href="/Home/AddRecord?section=DistributorsWorkshops" class="btn btn-success rounded-pill px-3 fw-bold" style="background-color: #20c997; border-color: #20c997;">＋ إضافة</a>
                     <a href="/Home/ExportExcel?section=DistributorsWorkshops" class="btn btn-success rounded-pill px-3 fw-bold">📊 تصدير إكسل</a>
