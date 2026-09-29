@@ -94,10 +94,8 @@ namespace SharjahEventsWeb.Controllers
             try { distributors = _context.DistributorsConferences.ToList(); } catch { }
             try { newYork = _context.NewYorkSessions.ToList(); } catch { }
             try { publishersConf = _context.PublishersConferences.ToList(); } catch { }
-
-            // جلب الورش بشكل آمن تماماً بدون أي محاولة حفظ إجباري قد تسبب خطأ قاعدة البيانات
-            try { publishersWorkshops = _context.PublishersWorkshops.ToList(); } catch { publishersWorkshops = new List<PublishersWorkshop>(); }
-            try { distributorsWorkshops = _context.DistributorsWorkshops.ToList(); } catch { distributorsWorkshops = new List<DistributorsWorkshop>(); }
+            try { publishersWorkshops = _context.PublishersWorkshops.ToList(); } catch { }
+            try { distributorsWorkshops = _context.DistributorsWorkshops.ToList(); } catch { }
 
             if (!string.IsNullOrEmpty(searchQuery))
             {
@@ -172,7 +170,7 @@ namespace SharjahEventsWeb.Controllers
             }
             catch (Exception ex)
             {
-                TempData["SuccessMessage"] = "خطأ في الحفظ: " + ex.Message;
+                TempData["SuccessMessage"] = "خطأ في الحفظ (قد يكون بسبب هيكل الجدول في قاعدة البيانات): " + (ex.InnerException?.Message ?? ex.Message);
             }
 
             return RedirectToAction("Index", new { activeTab = section });
@@ -249,7 +247,7 @@ namespace SharjahEventsWeb.Controllers
             }
             catch (Exception ex)
             {
-                TempData["SuccessMessage"] = "خطأ في التحديث: " + ex.Message;
+                TempData["SuccessMessage"] = "خطأ في التحديث: " + (ex.InnerException?.Message ?? ex.Message);
             }
 
             return RedirectToAction("Index", new { activeTab = section });
