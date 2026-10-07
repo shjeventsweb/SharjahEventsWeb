@@ -420,12 +420,47 @@ namespace SharjahEventsWeb.Controllers
             if (HttpContext.Session.GetString("UserEmail") == null) return RedirectToAction("Login");
 
             var builder = new System.Text.StringBuilder();
-            builder.Append('\uFEFF');
+            builder.Append('\uFEFF'); // لضمان دعم اللغة العربية بشكل صحيح في Excel
             string fileName = "Export.csv";
 
             try
             {
-                if (section == "PublishersWorkshops")
+                if (section == "SharjahBookFairs")
+                {
+                    fileName = "SharjahBookFairs.csv";
+                    builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الإصدارات,التخصص,المساحة,الحالة");
+                    foreach (var i in _context.SharjahBookFairs.ToList())
+                        builder.AppendLine($"{i.ExhibitionYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)},{i.BookCount},{EscapeCsv(i.Specialization)},{EscapeCsv(i.RequiredSpace)},{(i.IsCompleted ? "مكتمل" : "قيد العمل")}");
+                }
+                else if (section == "SharjahChildFestivals")
+                {
+                    fileName = "SharjahChildFestivals.csv";
+                    builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الإصدارات,المساحة,الحالة");
+                    foreach (var i in _context.SharjahChildFestivals.ToList())
+                        builder.AppendLine($"{i.FestivalYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)},{i.BookCount},{EscapeCsv(i.RequiredSpace)},{(i.IsCompleted ? "مكتمل" : "قيد العمل")}");
+                }
+                else if (section == "DistributorsConferences")
+                {
+                    fileName = "DistributorsConferences.csv";
+                    builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الحالة");
+                    foreach (var i in _context.DistributorsConferences.ToList())
+                        builder.AppendLine($"{i.ConferenceYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)},{(i.IsCompleted ? "مكتمل" : "قيد العمل")}");
+                }
+                else if (section == "NewYorkSessions")
+                {
+                    fileName = "NewYorkSessions.csv";
+                    builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الحالة");
+                    foreach (var i in _context.NewYorkSessions.ToList())
+                        builder.AppendLine($"{i.SessionYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)},{(i.IsCompleted ? "مكتمل" : "قيد العمل")}");
+                }
+                else if (section == "PublishersConferences")
+                {
+                    fileName = "PublishersConferences.csv";
+                    builder.AppendLine("السنة,دار النشر,الدولة,المدينة,واتساب,الإيميل,المسؤول,الحالة");
+                    foreach (var i in _context.PublishersConferences.ToList())
+                        builder.AppendLine($"{i.ConferenceYear},{EscapeCsv(i.PublishingHouseName)},{EscapeCsv(i.Country)},{EscapeCsv(i.City)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{EscapeCsv(i.ResponsiblePerson)},{(i.IsCompleted ? "مكتمل" : "قيد العمل")}");
+                }
+                else if (section == "PublishersWorkshops")
                 {
                     fileName = "PublishersWorkshops.csv";
                     builder.AppendLine("السنة,اسم المحاضر,الدولة,واتساب,الإيميل,الحالة");
@@ -440,7 +475,10 @@ namespace SharjahEventsWeb.Controllers
                         builder.AppendLine($"{i.WorkshopYear},{EscapeCsv(i.LecturerName)},{EscapeCsv(i.Country)},{EscapeCsv(i.WhatsAppNumber)},{EscapeCsv(i.Email)},{(i.IsCompleted ? "مكتمل" : "قيد العمل")}");
                 }
             }
-            catch { }
+           catch
+            {
+                // في حال حدوث خطأ
+            }
 
             return File(System.Text.Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", fileName);
         }
