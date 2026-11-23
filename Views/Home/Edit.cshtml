@@ -20,10 +20,16 @@
                             <label class="form-label fw-bold">السنة</label>
                             <input type="number" name="workshopYear" value="@Model.WorkshopYear" class="form-control rounded-3" required />
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">اسم المحاضر</label>
-                            <input type="text" name="lecturerName" value="@Model.LecturerName" class="form-control rounded-3" required />
-                        </div>
+                        <div class="row">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold">اسم المحاضر</label>
+        <input type="text" name="lecturerName" value="@Model.LecturerName" class="form-control rounded-3" required />
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold">اسم الورشة</label>
+        <input type="text" name="workshopName" value="@Model.WorkshopName" class="form-control rounded-3" required />
+    </div>
+</div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">الدولة</label>
                             <input type="text" name="country" value="@Model.Country" class="form-control rounded-3" />
