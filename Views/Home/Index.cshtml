@@ -351,13 +351,14 @@
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-info">
-                        <tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الحالة</th><th>الإجراءات</th></tr>
-                    </thead>
+    <tr><th>السنة</th><th>اسم المحاضر</th><th>اسم الورشة</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الحالة</th><th>الإجراءات</th></tr>
+</thead>
                     <tbody>
                         @foreach (var item in publishersWorkshops) {
                             <tr>
                                 <td>@item.WorkshopYear</td>
                                 <td class="fw-bold">@item.LecturerName</td>
+                                <td>@item.WorkshopName</td>
                                 <td>@item.Country</td>
                                 <td>@item.WhatsAppNumber</td>
                                 <td>@item.Email</td>
@@ -401,13 +402,14 @@
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead style="background-color: #20c997; color: white;">
-                        <tr><th>السنة</th><th>اسم المحاضر</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الحالة</th><th>الإجراءات</th></tr>
-                    </thead>
+    <tr><th>السنة</th><th>اسم المحاضر</th><th>اسم الورشة</th><th>الدولة</th><th>واتساب</th><th>الإيميل</th><th>الحالة</th><th>الإجراءات</th></tr>
+</thead>
                     <tbody>
                         @foreach (var item in distributorsWorkshops) {
                             <tr>
                                 <td>@item.WorkshopYear</td>
                                 <td class="fw-bold">@item.LecturerName</td>
+                                <td>@item.WorkshopName</td>
                                 <td>@item.Country</td>
                                 <td>@item.WhatsAppNumber</td>
                                 <td>@item.Email</td>
